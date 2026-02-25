@@ -74,6 +74,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { copyToClipboard as quasarCopy } from 'quasar';
 import MarkdownIt from 'markdown-it';
+import DOMPurify from 'dompurify';
 import { usePlanStore } from '@/stores/plan';
 import { useIdeasStore } from '@/stores/ideas';
 import { useGeneratePlan } from '@/composables/useGeneratePlan';
@@ -97,7 +98,7 @@ const planTitle = computed(() =>
 
 const renderedMarkdown = computed(() => {
   if (!planStore.markdown) return '';
-  return md.render(planStore.markdown);
+  return DOMPurify.sanitize(md.render(planStore.markdown));
 });
 
 async function loadPlanById(id: string) {

@@ -15,7 +15,9 @@ export function usePlansHistory() {
     error.value = null;
 
     try {
-      const query = niche ? `?niche=${niche}` : '';
+      const params = new URLSearchParams();
+      if (niche) params.append('niche', niche);
+      const query = params.toString() ? `?${params.toString()}` : '';
       history.value = await get<VideoPlan[]>(`/api/plans${query}`);
       console.debug('[usePlansHistory] fetchAll() completed', { count: history.value.length });
     } catch (err) {

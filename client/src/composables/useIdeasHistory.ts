@@ -15,7 +15,9 @@ export function useIdeasHistory() {
     error.value = null;
 
     try {
-      const query = niche ? `?niche=${niche}` : '';
+      const params = new URLSearchParams();
+      if (niche) params.append('niche', niche);
+      const query = params.toString() ? `?${params.toString()}` : '';
       history.value = await get<VideoIdea[]>(`/api/ideas${query}`);
       console.debug('[useIdeasHistory] fetchAll() completed', { count: history.value.length });
     } catch (err) {
