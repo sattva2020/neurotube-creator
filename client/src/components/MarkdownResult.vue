@@ -23,6 +23,7 @@
 import { computed, onMounted } from 'vue';
 import { copyToClipboard } from 'quasar';
 import MarkdownIt from 'markdown-it';
+import DOMPurify from 'dompurify';
 
 const props = defineProps<{
   content: string;
@@ -32,7 +33,7 @@ const md = new MarkdownIt({ html: false, linkify: true, typographer: true });
 
 const rendered = computed(() => {
   if (!props.content) return '';
-  return md.render(props.content);
+  return DOMPurify.sanitize(md.render(props.content));
 });
 
 function copyRaw() {

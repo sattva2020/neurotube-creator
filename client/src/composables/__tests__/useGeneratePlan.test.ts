@@ -35,7 +35,8 @@ describe('useGeneratePlan', () => {
   });
 
   it('calls API and updates planStore', async () => {
-    mockFetch.mockResolvedValueOnce(jsonResponse({ data: '# Plan\nContent here' }));
+    const mockPlan = { id: 'p-1', title: 'Test Idea', markdown: '# Plan\nContent here', niche: 'psychology', createdAt: '2026-01-01' };
+    mockFetch.mockResolvedValueOnce(jsonResponse({ data: mockPlan }));
 
     const ideasStore = useIdeasStore();
     ideasStore.selectIdea(mockIdea);
@@ -45,11 +46,13 @@ describe('useGeneratePlan', () => {
 
     const planStore = usePlanStore();
     expect(planStore.markdown).toBe('# Plan\nContent here');
+    expect(planStore.plan?.id).toBe('p-1');
     expect(planStore.isLoading).toBe(false);
   });
 
   it('sends correct payload', async () => {
-    mockFetch.mockResolvedValueOnce(jsonResponse({ data: '# Plan' }));
+    const mockPlan = { id: 'p-2', title: 'Test Idea', markdown: '# Plan', niche: 'psychology' };
+    mockFetch.mockResolvedValueOnce(jsonResponse({ data: mockPlan }));
 
     const ideasStore = useIdeasStore();
     ideasStore.selectIdea(mockIdea);

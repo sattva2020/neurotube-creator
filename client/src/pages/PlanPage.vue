@@ -11,8 +11,8 @@
       @click="router.push({ name: 'index' })"
     />
 
-    <!-- No idea selected -->
-    <q-banner v-if="!ideasStore.selected" class="bg-warning text-white q-mb-md" rounded>
+    <!-- No idea selected and no plan loaded -->
+    <q-banner v-if="!ideasStore.selected && !planStore.plan && !planStore.isLoading && !loadingById" class="bg-warning text-white q-mb-md" rounded>
       <template #avatar>
         <q-icon name="warning" />
       </template>
@@ -20,9 +20,11 @@
     </q-banner>
 
     <!-- Loading -->
-    <div v-if="planStore.isLoading" class="column items-center q-pa-xl">
+    <div v-if="planStore.isLoading || loadingById" class="column items-center q-pa-xl">
       <q-spinner-dots size="48px" color="primary" />
-      <p class="text-body1 text-grey-7 q-mt-md">Генерируем план видео...</p>
+      <p class="text-body1 text-grey-7 q-mt-md">
+        {{ loadingById ? 'Загружаем план...' : 'Генерируем план видео...' }}
+      </p>
     </div>
 
     <!-- Error -->
@@ -32,14 +34,14 @@
       </template>
       {{ error }}
       <template #action>
-        <q-btn flat label="Повторить" @click="generatePlan" />
+        <q-btn v-if="ideasStore.selected" flat label="Повторить" @click="generatePlan" />
       </template>
     </q-banner>
 
     <!-- Plan content -->
-    <div v-if="planStore.markdown && !planStore.isLoading" class="plan-content">
+    <div v-if="planStore.markdown && !planStore.isLoading && !loadingById" class="plan-content">
       <div class="row items-center justify-between q-mb-md">
-        <span class="text-h5 text-weight-bold">{{ ideasStore.selected?.title ?? 'План видео' }}</span>
+        <span class="text-h5 text-weight-bold">{{ planTitle }}</span>
         <q-btn
           flat
           round
@@ -69,26 +71,57 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { copyToClipboard as quasarCopy } from 'quasar';
 import MarkdownIt from 'markdown-it';
+import DOMPurify from 'dompurify';
 import { usePlanStore } from '@/stores/plan';
 import { useIdeasStore } from '@/stores/ideas';
 import { useGeneratePlan } from '@/composables/useGeneratePlan';
+import { usePlansHistory } from '@/composables/usePlansHistory';
 
 const md = new MarkdownIt({ html: false, linkify: true, typographer: true });
 
 const router = useRouter();
+const route = useRoute();
 const planStore = usePlanStore();
 const ideasStore = useIdeasStore();
 const { generate } = useGeneratePlan();
+const { fetchById } = usePlansHistory();
 
 const error = ref('');
+const loadingById = ref(false);
+
+const planTitle = computed(() =>
+  ideasStore.selected?.title ?? planStore.plan?.title ?? 'План видео',
+);
 
 const renderedMarkdown = computed(() => {
   if (!planStore.markdown) return '';
-  return md.render(planStore.markdown);
+  return DOMPurify.sanitize(md.render(planStore.markdown));
 });
+
+async function loadPlanById(id: string) {
+  console.debug('[PlanPage] Loading plan by id:', id);
+  loadingById.value = true;
+  error.value = '';
+
+  try {
+    const plan = await fetchById(id);
+    if (plan) {
+      planStore.setPlan(plan);
+      console.debug('[PlanPage] Plan loaded from DB:', plan.title);
+    } else {
+      error.value = 'План не найден.';
+      console.debug('[PlanPage] Plan not found:', id);
+    }
+  } catch (e) {
+    error.value = 'Не удалось загрузить план.';
+    console.error('[PlanPage] Failed to load plan:', e);
+  } finally {
+    loadingById.value = false;
+  }
+}
 
 async function generatePlan() {
   if (!ideasStore.selected) return;
@@ -106,18 +139,24 @@ function copyToClipboard() {
   console.debug('[PlanPage] Copying plan to clipboard');
   quasarCopy(planStore.markdown)
     .then(() => console.debug('[PlanPage] Copied successfully'))
-    .catch((err) => console.error('[PlanPage] Copy failed:', err));
+    .catch((err: unknown) => console.error('[PlanPage] Copy failed:', err));
 }
 
 onMounted(() => {
-  console.debug('[PlanPage] Mounted, selected idea:', ideasStore.selected?.title ?? 'none');
-  if (ideasStore.selected && !planStore.markdown) {
+  const id = route.params.id as string | undefined;
+  console.debug('[PlanPage] Mounted', { id, selectedIdea: ideasStore.selected?.title ?? 'none' });
+
+  if (id) {
+    // Deep-link: load plan by ID from DB
+    loadPlanById(id);
+  } else if (ideasStore.selected && !planStore.markdown) {
+    // Generate from selected idea
     generatePlan();
   }
 });
 
 watch(() => ideasStore.selected, (newIdea) => {
-  if (newIdea && !planStore.markdown) {
+  if (newIdea && !planStore.markdown && !route.params.id) {
     console.debug('[PlanPage] Selected idea changed, generating plan');
     generatePlan();
   }

@@ -21,13 +21,20 @@ const mockIdeas: VideoIdea[] = [
 describe('Ideas Routes', () => {
   let app: Hono;
   let mockGenerateIdeas: { execute: ReturnType<typeof vi.fn> };
-  let mockIdeaRepo: { saveMany: ReturnType<typeof vi.fn>; findAll: ReturnType<typeof vi.fn> };
+  let mockIdeaRepo: {
+    saveMany: ReturnType<typeof vi.fn>;
+    findAll: ReturnType<typeof vi.fn>;
+    findById: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(() => {
     mockGenerateIdeas = { execute: vi.fn().mockResolvedValue(mockIdeas) };
     mockIdeaRepo = {
       saveMany: vi.fn().mockResolvedValue(mockIdeas),
       findAll: vi.fn().mockResolvedValue(mockIdeas),
+      findById: vi.fn().mockResolvedValue(mockIdeas[0]),
+      delete: vi.fn().mockResolvedValue(undefined),
     };
 
     app = new Hono();
@@ -76,6 +83,52 @@ describe('Ideas Routes', () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ topic: '', niche: 'psychology' }),
+      });
+
+      expect(res.status).toBe(400);
+    });
+  });
+
+  describe('GET /api/ideas/:id', () => {
+    it('should return idea by id', async () => {
+      const res = await app.request('/api/ideas/550e8400-e29b-41d4-a716-446655440000');
+
+      expect(res.status).toBe(200);
+      const body = await res.json() as { data: VideoIdea };
+      expect(body.data).toEqual(mockIdeas[0]);
+      expect(mockIdeaRepo.findById).toHaveBeenCalledWith('550e8400-e29b-41d4-a716-446655440000');
+    });
+
+    it('should return 404 when idea not found', async () => {
+      mockIdeaRepo.findById.mockResolvedValue(null);
+
+      const res = await app.request('/api/ideas/550e8400-e29b-41d4-a716-446655440000');
+
+      expect(res.status).toBe(404);
+    });
+
+    it('should return 400 for invalid uuid', async () => {
+      const res = await app.request('/api/ideas/not-a-uuid');
+
+      expect(res.status).toBe(400);
+    });
+  });
+
+  describe('DELETE /api/ideas/:id', () => {
+    it('should delete idea by id', async () => {
+      const res = await app.request('/api/ideas/550e8400-e29b-41d4-a716-446655440000', {
+        method: 'DELETE',
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json() as { success: boolean };
+      expect(body.success).toBe(true);
+      expect(mockIdeaRepo.delete).toHaveBeenCalledWith('550e8400-e29b-41d4-a716-446655440000');
+    });
+
+    it('should return 400 for invalid uuid', async () => {
+      const res = await app.request('/api/ideas/not-a-uuid', {
+        method: 'DELETE',
       });
 
       expect(res.status).toBe(400);

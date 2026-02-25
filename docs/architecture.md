@@ -43,8 +43,8 @@ NeuroTube Creator — fullstack-приложение с чётким разде�
 pages/       → Route pages (IndexPage, PlanPage, ToolsPage)
 layouts/     → App shell (MainLayout)
 components/  → Reusable UI (NicheToggle, IdeaCard, ToolCard, dialogs)
-composables/ → Business logic hooks (useGenerateIdeas, useGeneratePlan, useApi, 10 AI tool composables)
-stores/      → Pinia state (ideas, plan, niche, toolResults)
+composables/ → Business logic hooks (useGenerateIdeas, useGeneratePlan, useApi, useIdeasHistory, usePlansHistory, 10 AI tool composables)
+stores/      → Pinia state (ideas, plan, niche with localStorage, toolResults)
 ```
 
 ## Dependency Rules
@@ -91,7 +91,9 @@ neurotube-creator/
 │   │   ├── composables/
 │   │   │   ├── useGenerateIdeas.ts  # Idea generation → API + store
 │   │   │   ├── useGeneratePlan.ts   # Plan generation → API + store
-│   │   │   ├── useApi.ts            # Base HTTP client (fetch wrapper)
+│   │   │   ├── useApi.ts            # Base HTTP client (fetch wrapper: get, post, del)
+│   │   │   ├── useIdeasHistory.ts   # Saved ideas CRUD (fetchAll, fetchById, remove)
+│   │   │   ├── usePlansHistory.ts   # Saved plans CRUD (fetchAll, fetchById, remove)
 │   │   │   ├── useGenerateThumbnail.ts  # Thumbnail generation
 │   │   │   ├── useGenerateTitles.ts     # Title alternatives
 │   │   │   ├── useGenerateDescription.ts # YouTube description
@@ -104,8 +106,8 @@ neurotube-creator/
 │   │   │   └── useGenerateSuno.ts       # Suno.ai music prompt
 │   │   ├── stores/
 │   │   │   ├── ideas.ts             # Generated ideas state
-│   │   │   ├── plan.ts              # Current plan state
-│   │   │   ├── niche.ts             # Active niche state
+│   │   │   ├── plan.ts              # Current plan state (full VideoPlan entity)
+│   │   │   ├── niche.ts             # Active niche state (persisted to localStorage)
 │   │   │   └── toolResults.ts       # AI tools results, loading, errors (keyed by tool)
 │   │   └── router/
 │   │       └── routes.ts            # Vue Router routes (/, /plan, /tools)
@@ -115,7 +117,7 @@ neurotube-creator/
 │   ├── src/
 │   │   ├── domain/                  # Pure business logic (zero deps)
 │   │   │   ├── entities/            # VideoIdea, VideoPlan, Niche
-│   │   │   └── ports/               # IAiService, IIdeaRepository, IPlanRepository
+│   │   │   └── ports/               # IAiService, IIdeaRepository, IPlanRepository (CRUD: saveMany/save, findAll, findById, delete)
 │   │   ├── application/             # Use Cases (depends on domain only)
 │   │   │   ├── use-cases/           # 12 AI generation use cases
 │   │   │   └── dto/                 # Input/output DTOs
@@ -164,9 +166,9 @@ User Input → IndexPage.vue
                                 │       │       │
                                 │       │       └─→ Hono route → GeneratePlan use case → GeminiAiService
                                 │       │               │
-                                │       │               └─→ Response: string (markdown)
+                                │       │               └─→ Response: VideoPlan { id, title, markdown, niche }
                                 │       │
-                                │       └─→ planStore.setPlan(markdown)
+                                │       └─→ planStore.setPlan(plan)
                                 │               │
                                 │               └─→ markdown-it render → v-html
                                 │
@@ -194,10 +196,15 @@ User Input → IndexPage.vue
 - UI текст: **русский** (targetAudience, whyItWorks, кнопки)
 - AI-generated контент: **английский** (title, hook, keywords — для Tier-1 аудитории)
 
-### State Management
+### State Management & Data Persistence
 - Pinia stores хранят данные между страницами (ideas, selected idea, plan)
 - Composables инкапсулируют API-логику и обновляют stores
 - Компоненты читают из stores, не вызывают API напрямую
+- **Plan store** хранит полный `VideoPlan` объект (id, title, markdown, niche) вместо голого markdown
+- **Niche store** сохраняет выбор ниши в `localStorage` (ключ: `neurotube-niche`)
+- **useIdeasHistory / usePlansHistory** composables загружают сохранённые данные из PostgreSQL
+- **IndexPage** отображает историю идей при маунте, перезагружает при смене ниши
+- **PlanPage** поддерживает deep-linking: `/plan/:id` загружает план из БД
 
 ## See Also
 

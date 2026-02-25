@@ -8,4 +8,10 @@ export interface IPlanRepository {
 
   /** Retrieve all saved plans, optionally filtered by niche */
   findAll(niche?: Niche): Promise<VideoPlan[]>;
+
+  /** Find a single plan by ID */
+  findById(id: string): Promise<VideoPlan | null>;
+
+  /** Delete a plan by ID */
+  delete(id: string): Promise<void>;
 }

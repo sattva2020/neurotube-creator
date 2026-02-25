@@ -16,15 +16,21 @@ function createMockDb() {
   const values = vi.fn().mockReturnValue({ returning });
   const insertFn = vi.fn().mockReturnValue({ values });
 
+  const limit = vi.fn();
+  const findByIdWhere = vi.fn().mockReturnValue({ limit });
   const where = vi.fn();
   const orderBy = vi.fn().mockReturnValue({ where });
-  const from = vi.fn().mockReturnValue({ orderBy });
+  const from = vi.fn().mockReturnValue({ orderBy, where: findByIdWhere });
   const select = vi.fn().mockReturnValue({ from });
+
+  const deleteWhere = vi.fn().mockResolvedValue(undefined);
+  const deleteFn = vi.fn().mockReturnValue({ where: deleteWhere });
 
   return {
     insert: insertFn,
     select,
-    _chain: { values, returning, from, orderBy, where },
+    delete: deleteFn,
+    _chain: { values, returning, from, orderBy, where, findByIdWhere, limit, deleteWhere },
   };
 }
 
@@ -129,6 +135,55 @@ describe('PlanRepository', () => {
       db._chain.orderBy.mockRejectedValue(new Error('DB query failed'));
 
       await expect(repo.findAll()).rejects.toThrow('DB query failed');
+    });
+  });
+
+  describe('findById', () => {
+    it('should return entity when found', async () => {
+      db._chain.limit.mockResolvedValue([mockDbRow]);
+
+      const result = await repo.findById('plan-uuid-1');
+
+      expect(db.select).toHaveBeenCalled();
+      expect(db._chain.findByIdWhere).toHaveBeenCalled();
+      expect(db._chain.limit).toHaveBeenCalledWith(1);
+      expect(result).toEqual({
+        id: 'plan-uuid-1',
+        ideaId: undefined,
+        title: 'Brain Hacks 101',
+        markdown: '## Plan\n\nDetailed production plan...',
+        niche: 'psychology',
+        createdAt: new Date('2026-01-01'),
+      });
+    });
+
+    it('should return null when not found', async () => {
+      db._chain.limit.mockResolvedValue([]);
+
+      const result = await repo.findById('nonexistent');
+
+      expect(result).toBeNull();
+    });
+
+    it('should propagate database errors', async () => {
+      db._chain.limit.mockRejectedValue(new Error('DB query failed'));
+
+      await expect(repo.findById('plan-uuid-1')).rejects.toThrow('DB query failed');
+    });
+  });
+
+  describe('delete', () => {
+    it('should call delete with correct id', async () => {
+      await repo.delete('plan-uuid-1');
+
+      expect(db.delete).toHaveBeenCalled();
+      expect(db._chain.deleteWhere).toHaveBeenCalled();
+    });
+
+    it('should propagate database errors', async () => {
+      db._chain.deleteWhere.mockRejectedValue(new Error('DB delete failed'));
+
+      await expect(repo.delete('plan-uuid-1')).rejects.toThrow('DB delete failed');
     });
   });
 });

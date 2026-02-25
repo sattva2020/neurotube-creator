@@ -55,9 +55,17 @@ const mockIdea: VideoIdea = {
 
 describe('IndexPage', () => {
   beforeEach(() => {
+    localStorage.clear();
     setActivePinia(createPinia());
     mockFetch.mockReset();
     mockPush.mockReset();
+    // Default mock for history fetch (GET /api/ideas)
+    mockFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      statusText: 'OK',
+      json: () => Promise.resolve({ data: [] }),
+    });
   });
 
   it('renders hero title for psychology niche', () => {
