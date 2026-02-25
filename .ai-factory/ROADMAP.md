@@ -11,8 +11,8 @@
 - [x] **Use Cases & Application Layer** — 12 use cases (GenerateIdeas, GeneratePlan, GenerateThumbnail, etc.)
 - [x] **Database Layer (PostgreSQL + Drizzle)** — schema, migrations, repository implementations, docker-compose для локальной БД
 - [x] **API Routes & Middleware** — Hono routes с Zod-валидацией, CORS, rate limiter, error handler, health check
-- [ ] **Frontend Foundation (Vue 3 + Quasar)** — client/ scaffold с Quasar CLI, routing, MainLayout, Pinia stores
-- [ ] **Core UI Migration** — IndexPage (поиск, список идей), PlanPage (просмотр плана), NicheToggle, IdeaCard
+- [x] **Frontend Foundation (Vue 3 + Quasar)** — client/ scaffold с Quasar CLI, routing, MainLayout, Pinia stores
+- [x] **Core UI Migration** — IndexPage (поиск, список идей), PlanPage (просмотр плана), NicheToggle, IdeaCard
 - [ ] **AI Tools UI Components** — ThumbnailGenerator, TitleGenerator, DescriptionGenerator, BrandingGenerator, прочие AI-инструменты
 - [ ] **State Management & Data Persistence** — Pinia stores, сохранение/загрузка идей и планов из PostgreSQL
 - [ ] **Docker & Dokploy Deployment** — multi-stage Dockerfile, docker-compose.yml, Dokploy конфигурация, env management
@@ -30,3 +30,5 @@
 | Use Cases & Application Layer | 2026-02-25 |
 | Database Layer (PostgreSQL + Drizzle) | 2026-02-25 |
 | API Routes & Middleware | 2026-02-25 |
+| Frontend Foundation (Vue 3 + Quasar) | 2026-02-25 |
+| Core UI Migration | 2026-02-25 |

@@ -50,7 +50,7 @@ Open `http://localhost:9000` and start generating.
 
 ## Deploy
 
-Built as a Google AI Studio applet. View in AI Studio: https://ai.studio/apps/f801c82a-78b7-49b8-9724-398afd48d015
+Deployed via Dokploy (self-hosted PaaS, Docker). Single container serves both Hono API and Vue 3 static build.
 
 ## License
 
