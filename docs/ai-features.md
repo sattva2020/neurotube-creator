@@ -138,6 +138,44 @@ interface ChannelBranding {
 | **Model** | gemini-3-flash-preview |
 | **Description** | 30-дневный контент-план: 4 длинных видео + 12 Shorts + Community Tab |
 
+## AI Tools UI
+
+Все 10 AI-инструментов (кроме генерации идей и плана) доступны на отдельной странице `/tools`.
+
+### Architecture
+
+```
+ToolsPage.vue → 10 ToolCard → click → open Dialog
+  Dialog → composable.generate() → useApi.post('/api/...') → backend
+  Backend → response → composable → toolResultsStore → dialog renders result
+```
+
+### Dialog Types
+
+| Dialog | Tools | Output Rendering |
+|--------|-------|-----------------|
+| **ThumbnailDialog** | Thumbnail | base64 → `<q-img>` + download |
+| **TitlesDialog** | Titles | `string[]` → `<q-list>` with per-item copy |
+| **BrandingDialog** | Branding | `ChannelBranding` → structured cards/chips |
+| **MarkdownToolDialog** | Description, NotebookLM, Shorts, Niche Analysis, Monetization, Roadmap, Suno | `string` → `MarkdownResult.vue` (markdown-it) |
+
+### State Management
+
+Единый Pinia store `toolResults` для всех 10 инструментов:
+- `results[toolKey]` — результат генерации
+- `loading[toolKey]` — состояние загрузки
+- `errors[toolKey]` — ошибки
+
+Каждый composable (useGenerateThumbnail, useGenerateTitles, etc.) оборачивает вызов API и обновляет store.
+
+### Navigation Flow
+
+```
+IndexPage → generate ideas → select idea
+  → PlanPage → generate plan → "AI Tools" button
+    → ToolsPage → 10 tool cards → click → dialog → generate → result
+```
+
 ## Bilingual Prompt Strategy
 
 Все промпты содержат инструкцию:

@@ -40,11 +40,11 @@ NeuroTube Creator — fullstack-приложение с чётким разде�
 ### Frontend — Quasar Conventions
 
 ```
-pages/       → Route pages (IndexPage, PlanPage)
+pages/       → Route pages (IndexPage, PlanPage, ToolsPage)
 layouts/     → App shell (MainLayout)
-components/  → Reusable UI (NicheToggle, IdeaCard)
-composables/ → Business logic hooks (useGenerateIdeas, useGeneratePlan, useApi)
-stores/      → Pinia state (ideas, plan, niche)
+components/  → Reusable UI (NicheToggle, IdeaCard, ToolCard, dialogs)
+composables/ → Business logic hooks (useGenerateIdeas, useGeneratePlan, useApi, 10 AI tool composables)
+stores/      → Pinia state (ideas, plan, niche, toolResults)
 ```
 
 ## Dependency Rules
@@ -75,22 +75,40 @@ neurotube-creator/
 │   ├── src/
 │   │   ├── pages/
 │   │   │   ├── IndexPage.vue        # Home — niche toggle, search, idea list
-│   │   │   └── PlanPage.vue         # Video plan viewer (markdown rendering)
+│   │   │   ├── PlanPage.vue         # Video plan viewer (markdown rendering)
+│   │   │   └── ToolsPage.vue        # AI tools grid with 10 tool cards
 │   │   ├── layouts/
-│   │   │   └── MainLayout.vue       # App shell — header, footer
+│   │   │   └── MainLayout.vue       # App shell — header, drawer, footer
 │   │   ├── components/
 │   │   │   ├── NicheToggle.vue      # Psychology/Ambient switcher
-│   │   │   └── IdeaCard.vue         # Single video idea card
+│   │   │   ├── IdeaCard.vue         # Single video idea card
+│   │   │   ├── ToolCard.vue         # AI tool card for grid display
+│   │   │   ├── MarkdownResult.vue   # Reusable markdown renderer with copy
+│   │   │   ├── ThumbnailDialog.vue  # Image generation dialog
+│   │   │   ├── TitlesDialog.vue     # Title list dialog with copy
+│   │   │   ├── BrandingDialog.vue   # Structured branding display dialog
+│   │   │   └── MarkdownToolDialog.vue # Generic dialog for 7 markdown tools
 │   │   ├── composables/
 │   │   │   ├── useGenerateIdeas.ts  # Idea generation → API + store
 │   │   │   ├── useGeneratePlan.ts   # Plan generation → API + store
-│   │   │   └── useApi.ts            # Base HTTP client (fetch wrapper)
+│   │   │   ├── useApi.ts            # Base HTTP client (fetch wrapper)
+│   │   │   ├── useGenerateThumbnail.ts  # Thumbnail generation
+│   │   │   ├── useGenerateTitles.ts     # Title alternatives
+│   │   │   ├── useGenerateDescription.ts # YouTube description
+│   │   │   ├── useGenerateBranding.ts   # Channel branding
+│   │   │   ├── useGenerateNotebookLM.ts # NotebookLM document
+│   │   │   ├── useGenerateShorts.ts     # Shorts spinoffs
+│   │   │   ├── useAnalyzeNiche.ts       # Niche analysis
+│   │   │   ├── useGenerateMonetization.ts # Monetization copy
+│   │   │   ├── useGenerateRoadmap.ts    # 30-day content roadmap
+│   │   │   └── useGenerateSuno.ts       # Suno.ai music prompt
 │   │   ├── stores/
 │   │   │   ├── ideas.ts             # Generated ideas state
 │   │   │   ├── plan.ts              # Current plan state
-│   │   │   └── niche.ts             # Active niche state
+│   │   │   ├── niche.ts             # Active niche state
+│   │   │   └── toolResults.ts       # AI tools results, loading, errors (keyed by tool)
 │   │   └── router/
-│   │       └── routes.ts            # Vue Router routes
+│   │       └── routes.ts            # Vue Router routes (/, /plan, /tools)
 │   └── package.json
 │
 ├── server/                          # Backend — Hono + Clean Architecture
@@ -114,7 +132,7 @@ neurotube-creator/
 ├── shared/                          # Shared TypeScript types
 │   └── types/
 │       ├── api.ts                   # ApiResponse, ApiError
-│       └── idea.ts                  # VideoIdea, VideoPlan, Niche
+│       └── idea.ts                  # VideoIdea, VideoPlan, Niche, ChannelBranding
 │
 └── package.json                     # Root workspace config
 ```
@@ -140,17 +158,28 @@ User Input → IndexPage.vue
                         │
                         └─→ PlanPage.vue (onMounted)
                                 │
-                                └─→ useGeneratePlan.generate()
+                                ├─→ useGeneratePlan.generate()
+                                │       │
+                                │       ├─→ useApi.post('/api/plans/generate')
+                                │       │       │
+                                │       │       └─→ Hono route → GeneratePlan use case → GeminiAiService
+                                │       │               │
+                                │       │               └─→ Response: string (markdown)
+                                │       │
+                                │       └─→ planStore.setPlan(markdown)
+                                │               │
+                                │               └─→ markdown-it render → v-html
+                                │
+                                └─→ User clicks "AI Tools" → navigate to /tools
                                         │
-                                        ├─→ useApi.post('/api/plans/generate')
-                                        │       │
-                                        │       └─→ Hono route → GeneratePlan use case → GeminiAiService
-                                        │               │
-                                        │               └─→ Response: string (markdown)
-                                        │
-                                        └─→ planStore.setPlan(markdown)
+                                        └─→ ToolsPage.vue
                                                 │
-                                                └─→ markdown-it render → v-html
+                                                ├─→ 10 ToolCard components in grid
+                                                └─→ Click card → open dialog
+                                                        │
+                                                        └─→ composable.generate() → useApi.post('/api/...')
+                                                                → toolResultsStore.setResult()
+                                                                → dialog renders result
 ```
 
 ## Key Patterns
