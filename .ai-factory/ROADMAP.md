@@ -13,11 +13,11 @@
 - [x] **API Routes & Middleware** — Hono routes с Zod-валидацией, CORS, rate limiter, error handler, health check
 - [x] **Frontend Foundation (Vue 3 + Quasar)** — client/ scaffold с Quasar CLI, routing, MainLayout, Pinia stores
 - [x] **Core UI Migration** — IndexPage (поиск, список идей), PlanPage (просмотр плана), NicheToggle, IdeaCard
-- [ ] **AI Tools UI Components** — ThumbnailGenerator, TitleGenerator, DescriptionGenerator, BrandingGenerator, прочие AI-инструменты
+- [x] **AI Tools UI Components** — ThumbnailGenerator, TitleGenerator, DescriptionGenerator, BrandingGenerator, прочие AI-инструменты
 - [ ] **State Management & Data Persistence** — Pinia stores, сохранение/загрузка идей и планов из PostgreSQL
 - [ ] **Docker & Dokploy Deployment** — multi-stage Dockerfile, docker-compose.yml, Dokploy конфигурация, env management
-- [ ] **Documentation Update** — обновить docs/ под fullstack архитектуру, README.md, getting-started
-- [ ] **Legacy Cleanup & Polish** — удалить src/ (React), обновить CI/CD, финальное тестирование, production readiness
+- [x] **Documentation Update** — обновить docs/ под fullstack архитектуру, README.md, getting-started
+- [x] **Legacy Cleanup & Polish** — удалить src/ (React), обновить CI/CD, финальное тестирование, production readiness
 
 ## Completed
 
@@ -32,3 +32,6 @@
 | API Routes & Middleware | 2026-02-25 |
 | Frontend Foundation (Vue 3 + Quasar) | 2026-02-25 |
 | Core UI Migration | 2026-02-25 |
+| AI Tools UI Components | 2026-02-25 |
+| Documentation Update | 2026-02-25 |
+| Legacy Cleanup & Polish | 2026-02-25 |

@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "Bash(true:*)",
+      "Bash(find E:\\\\My\\\\Youtube\\\\neurotube-creator\\\\server\\\\src\\\\presentation\\\\routes:*)"
     ]
   }
 }
