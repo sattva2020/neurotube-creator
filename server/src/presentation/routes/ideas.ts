@@ -3,7 +3,7 @@ import { zValidator } from '@hono/zod-validator';
 import type { GenerateIdeas } from '../../application/use-cases/GenerateIdeas.js';
 import type { IIdeaRepository } from '../../domain/ports/IIdeaRepository.js';
 import type { Niche } from '../../domain/entities/Niche.js';
-import { generateIdeasSchema, listIdeasQuerySchema } from '../schemas.js';
+import { generateIdeasSchema, listIdeasQuerySchema, uuidParamSchema } from '../schemas.js';
 import { createLogger } from '../../infrastructure/logger.js';
 
 const logger = createLogger('IdeasRoute');
@@ -19,6 +19,30 @@ export function ideasRoutes(generateIdeas: GenerateIdeas, ideaRepo: IIdeaReposit
     logger.info('Ideas generated', { count: ideas.length, topic, niche });
 
     return c.json({ data: ideas });
+  });
+
+  app.get('/:id', zValidator('param', uuidParamSchema), async (c) => {
+    const { id } = c.req.valid('param');
+    logger.debug('GET /api/ideas/:id', { id });
+
+    const idea = await ideaRepo.findById(id);
+    if (!idea) {
+      logger.info('Idea not found', { id });
+      return c.json({ error: 'Idea not found' }, 404);
+    }
+
+    logger.info('Idea fetched', { id, title: idea.title });
+    return c.json({ data: idea });
+  });
+
+  app.delete('/:id', zValidator('param', uuidParamSchema), async (c) => {
+    const { id } = c.req.valid('param');
+    logger.debug('DELETE /api/ideas/:id', { id });
+
+    await ideaRepo.delete(id);
+    logger.info('Idea deleted', { id });
+
+    return c.json({ success: true });
   });
 
   app.get('/', zValidator('query', listIdeasQuerySchema), async (c) => {

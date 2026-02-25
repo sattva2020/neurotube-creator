@@ -50,6 +50,36 @@ export class IdeaRepository implements IIdeaRepository {
     return result;
   }
 
+  async findById(id: string): Promise<VideoIdea | null> {
+    const start = Date.now();
+    logger.debug('findById() called', { id });
+
+    const [row] = await this.db
+      .select()
+      .from(ideas)
+      .where(eq(ideas.id, id))
+      .limit(1);
+
+    const elapsed = Date.now() - start;
+    if (!row) {
+      logger.info('findById() not found', { id, elapsed });
+      return null;
+    }
+
+    logger.info('findById() found', { id, title: row.title, elapsed });
+    return this.toEntity(row);
+  }
+
+  async delete(id: string): Promise<void> {
+    const start = Date.now();
+    logger.debug('delete() called', { id });
+
+    await this.db.delete(ideas).where(eq(ideas.id, id));
+
+    const elapsed = Date.now() - start;
+    logger.info('delete() completed', { id, elapsed });
+  }
+
   private toEntity(row: typeof ideas.$inferSelect): VideoIdea {
     return {
       id: row.id,

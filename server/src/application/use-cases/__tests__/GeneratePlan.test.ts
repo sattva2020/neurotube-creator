@@ -38,6 +38,8 @@ describe('GeneratePlan', () => {
     planRepo = {
       save: vi.fn().mockResolvedValue(savedPlan),
       findAll: vi.fn(),
+      findById: vi.fn(),
+      delete: vi.fn(),
     };
 
     useCase = new GeneratePlan(aiService, planRepo);

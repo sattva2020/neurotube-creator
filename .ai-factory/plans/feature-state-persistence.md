@@ -27,22 +27,22 @@ Complete the data persistence layer: extend backend with CRUD endpoints, fix cli
 
 ## Phase 1: Backend CRUD Foundation
 
-### Task 1: Extend domain ports with findById and delete
+### ~~Task 1: Extend domain ports with findById and delete~~ [x]
 - Files: `server/src/domain/ports/IIdeaRepository.ts`, `IPlanRepository.ts`
 - Add `findById(id: string): Promise<T | null>` and `delete(id: string): Promise<void>`
 
-### Task 2: Implement findById and delete in repositories
+### ~~Task 2: Implement findById and delete in repositories~~ [x]
 - Files: `server/src/infrastructure/db/IdeaRepository.ts`, `PlanRepository.ts`
 - Drizzle queries with `eq(table.id, id)`, return mapped entity or null
 - Blocked by: Task 1
 
-### Task 3: Add GET /:id and DELETE /:id server routes
+### ~~Task 3: Add GET /:id and DELETE /:id server routes~~ [x]
 - Files: `server/src/presentation/routes/ideas.ts`, `plans.ts`, `app.ts`
 - Zod validation for `:id` param (uuid)
 - Wire repos into route factories via `AppDeps`
 - Blocked by: Task 2
 
-### Task 4: Write tests for backend CRUD (repos + routes)
+### ~~Task 4: Write tests for backend CRUD (repos + routes)~~ [x]
 - Files: `server/src/infrastructure/db/__tests__/`, `server/src/presentation/routes/__tests__/`
 - Vitest with mocked repos
 - Blocked by: Task 3

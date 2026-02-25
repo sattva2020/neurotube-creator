@@ -2,6 +2,10 @@ import { z } from 'zod';
 
 // --- Shared field schemas ---
 
+export const uuidParamSchema = z.object({
+  id: z.string().uuid('Invalid UUID format'),
+});
+
 export const nicheSchema = z.enum(['psychology', 'ambient']);
 
 export const topicSchema = z.string().min(1, 'Topic is required').max(200);
