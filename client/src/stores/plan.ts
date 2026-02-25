@@ -1,20 +1,24 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import type { VideoPlan } from '@neurotube/shared';
 
 export const usePlanStore = defineStore('plan', () => {
-  const markdown = ref('');
+  const plan = ref<VideoPlan | null>(null);
   const isLoading = ref(false);
 
-  function setPlan(md: string) {
-    markdown.value = md;
-    console.debug('[PlanStore] Set plan, length:', md.length, 'chars');
+  const id = computed(() => plan.value?.id);
+  const markdown = computed(() => plan.value?.markdown ?? '');
+
+  function setPlan(value: VideoPlan) {
+    plan.value = value;
+    console.debug('[PlanStore] Set plan', { id: value.id, title: value.title, length: value.markdown.length });
   }
 
   function clear() {
-    markdown.value = '';
+    plan.value = null;
     isLoading.value = false;
     console.debug('[PlanStore] Cleared plan');
   }
 
-  return { markdown, isLoading, setPlan, clear };
+  return { plan, id, markdown, isLoading, setPlan, clear };
 });

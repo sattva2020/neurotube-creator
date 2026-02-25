@@ -61,24 +61,24 @@ feat(server): add CRUD endpoints for ideas and plans
 
 ## Phase 2: Client Stores & Composables
 
-### Task 5: Extend useApi with delete method
+### ~~Task 5: Extend useApi with delete method~~ [x]
 - File: `client/src/composables/useApi.ts`
 - Add `del<T>(path: string): Promise<T>` with HTTP DELETE
 
-### Task 6: Fix plan store to hold full VideoPlan entity
+### ~~Task 6: Fix plan store to hold full VideoPlan entity~~ [x]
 - Files: `client/src/stores/plan.ts`, `client/src/composables/useGeneratePlan.ts`
 - Store full `VideoPlan` instead of just `markdown: string`
 - Add `id` and `markdown` computed getters for backward compat
 - Fix useGeneratePlan to extract VideoPlan from response
 - Blocked by: Task 5
 
-### Task 7: Create useIdeasHistory composable
+### ~~Task 7: Create useIdeasHistory composable~~ [x]
 - File: `client/src/composables/useIdeasHistory.ts`
 - `fetchAll(niche?)`, `fetchById(id)`, `remove(id)`
 - Reactive state: `history`, `isLoading`, `error`
 - Blocked by: Task 5
 
-### Task 8: Create usePlansHistory composable
+### ~~Task 8: Create usePlansHistory composable~~ [x]
 - File: `client/src/composables/usePlansHistory.ts`
 - `fetchAll(niche?)`, `fetchById(id)`, `remove(id)`
 - Blocked by: Tasks 5, 6

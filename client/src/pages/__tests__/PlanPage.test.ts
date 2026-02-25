@@ -74,7 +74,7 @@ describe('PlanPage', () => {
     const ideasStore = useIdeasStore();
     ideasStore.selectIdea(mockIdea);
     const planStore = usePlanStore();
-    planStore.setPlan('# Hello World\n\nThis is a test plan.');
+    planStore.setPlan({ id: 'p-1', title: 'Hello World', markdown: '# Hello World\n\nThis is a test plan.', niche: 'psychology' });
 
     const wrapper = mountPlanPage();
     expect(wrapper.find('.plan-markdown').exists()).toBe(true);
@@ -86,7 +86,7 @@ describe('PlanPage', () => {
     const ideasStore = useIdeasStore();
     ideasStore.selectIdea(mockIdea);
     const planStore = usePlanStore();
-    planStore.setPlan('# Plan content');
+    planStore.setPlan({ id: 'p-2', title: 'Plan content', markdown: '# Plan content', niche: 'psychology' });
 
     const wrapper = mountPlanPage();
     expect(wrapper.text()).toContain('Test Video Idea');
@@ -102,7 +102,7 @@ describe('PlanPage', () => {
       ok: true,
       status: 200,
       statusText: 'OK',
-      json: () => Promise.resolve({ data: '# Generated plan' }),
+      json: () => Promise.resolve({ data: { id: 'p-3', title: 'Test Video Idea', markdown: '# Generated plan', niche: 'psychology' } }),
     });
 
     const ideasStore = useIdeasStore();
