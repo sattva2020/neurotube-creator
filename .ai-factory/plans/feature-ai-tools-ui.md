@@ -50,7 +50,7 @@
 
 ### Phase 2: Composables
 
-- [ ] **Task 3:** Create 10 AI tool composables *(blocked by: Task 1)*
+- [x] **Task 3:** Create 10 AI tool composables *(blocked by: Task 1)*
   - `client/src/composables/useGenerate{Thumbnail,Titles,Description,Branding,NotebookLM,Shorts,Monetization,Roadmap,Suno}.ts`
   - `client/src/composables/useAnalyzeNiche.ts`
 
