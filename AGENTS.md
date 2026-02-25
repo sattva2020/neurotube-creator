@@ -55,6 +55,11 @@ neurotube-creator/
 │   │   ├── infrastructure/
 │   │   │   ├── ai/
 │   │   │   │   └── GeminiAiService.ts  # Implements IAiService (12 methods)
+│   │   │   ├── db/
+│   │   │   │   ├── schema.ts          # Drizzle ORM schema (ideas + plans tables)
+│   │   │   │   ├── client.ts          # DB connection factory (postgres.js + drizzle)
+│   │   │   │   ├── IdeaRepository.ts  # Implements IIdeaRepository
+│   │   │   │   └── PlanRepository.ts  # Implements IPlanRepository
 │   │   │   ├── config/env.ts        # Zod-validated environment config
 │   │   │   └── logger.ts            # Structured logger (LOG_LEVEL)
 │   │   ├── presentation/
@@ -62,6 +67,8 @@ neurotube-creator/
 │   │   │   ├── middleware/errorHandler.ts
 │   │   │   └── app.ts              # Hono composition root
 │   │   └── index.ts                 # Server entry point
+│   ├── drizzle/                     # Generated SQL migrations
+│   ├── drizzle.config.ts            # Drizzle Kit config
 │   ├── package.json                 # @neurotube/server
 │   └── tsconfig.json
 │
@@ -95,6 +102,10 @@ neurotube-creator/
 | `server/src/domain/ports/IAiService.ts` | AI service interface |
 | `server/src/infrastructure/ai/GeminiAiService.ts` | Gemini API implementation |
 | `server/src/application/use-cases/index.ts` | All 12 use cases (barrel exports) |
+| `server/src/infrastructure/db/schema.ts` | Drizzle ORM schema (ideas + plans tables) |
+| `server/src/infrastructure/db/client.ts` | DB connection factory (postgres.js + drizzle) |
+| `server/drizzle.config.ts` | Drizzle Kit migration config |
+| `docker-compose.yml` | Local dev: PostgreSQL 16 |
 
 ## API Routes
 | Method | Path | Description |

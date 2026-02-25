@@ -9,7 +9,7 @@
 - [x] **Backend Foundation (Hono + Domain)** — server/ scaffold, Hono app, domain entities, ports (IAiService, repositories)
 - [x] **AI Service Migration** — перенос 12 промптов из geminiService.ts в GeminiAiService (infrastructure)
 - [x] **Use Cases & Application Layer** — 12 use cases (GenerateIdeas, GeneratePlan, GenerateThumbnail, etc.)
-- [ ] **Database Layer (PostgreSQL + Drizzle)** — schema, migrations, repository implementations, docker-compose для локальной БД
+- [x] **Database Layer (PostgreSQL + Drizzle)** — schema, migrations, repository implementations, docker-compose для локальной БД
 - [ ] **API Routes & Middleware** — Hono routes с Zod-валидацией, CORS, rate limiter, error handler, health check
 - [ ] **Frontend Foundation (Vue 3 + Quasar)** — client/ scaffold с Quasar CLI, routing, MainLayout, Pinia stores
 - [ ] **Core UI Migration** — IndexPage (поиск, список идей), PlanPage (просмотр плана), NicheToggle, IdeaCard
@@ -28,3 +28,4 @@
 | Backend Foundation (Hono + Domain) | 2026-02-25 |
 | AI Service Migration | 2026-02-25 |
 | Use Cases & Application Layer | 2026-02-25 |
+| Database Layer (PostgreSQL + Drizzle) | 2026-02-25 |
