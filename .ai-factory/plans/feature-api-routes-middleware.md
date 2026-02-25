@@ -61,14 +61,14 @@ Key decisions:
 
 ### Phase 3: Testing & Verification (Tasks 41-42)
 
-- [ ] **Task 41: Write tests for routes and middleware**
+- [x] **Task 41: Write tests for routes and middleware**
   - `server/src/presentation/routes/__tests__/ideas.test.ts`
   - `server/src/presentation/routes/__tests__/plans.test.ts`
   - `server/src/presentation/routes/__tests__/routes.test.ts` (combined for pure routes)
   - `server/src/presentation/middleware/__tests__/middleware.test.ts`
   - *Blocked by: Tasks 37, 38, 39, 40*
 
-- [ ] **Task 42: Verify compilation, run tests, and update docs**
+- [x] **Task 42: Verify compilation, run tests, and update docs**
   - tsc --noEmit, vitest run, update AGENTS.md + ROADMAP.md
   - *Blocked by: Task 41*
 

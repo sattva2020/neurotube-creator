@@ -63,9 +63,26 @@ neurotube-creator/
 │   │   │   ├── config/env.ts        # Zod-validated environment config
 │   │   │   └── logger.ts            # Structured logger (LOG_LEVEL)
 │   │   ├── presentation/
-│   │   │   ├── routes/health.ts     # GET /api/health
-│   │   │   ├── middleware/errorHandler.ts
-│   │   │   └── app.ts              # Hono composition root
+│   │   │   ├── routes/
+│   │   │   │   ├── health.ts        # GET /api/health
+│   │   │   │   ├── ideas.ts         # POST /generate, GET /
+│   │   │   │   ├── plans.ts         # POST /generate, GET /
+│   │   │   │   ├── thumbnails.ts    # POST /generate
+│   │   │   │   ├── titles.ts        # POST /generate
+│   │   │   │   ├── descriptions.ts  # POST /generate
+│   │   │   │   ├── branding.ts      # POST /generate
+│   │   │   │   ├── analysis.ts      # POST /niche
+│   │   │   │   ├── notebooklm.ts    # POST /generate
+│   │   │   │   ├── shorts.ts        # POST /generate
+│   │   │   │   ├── monetization.ts  # POST /generate
+│   │   │   │   ├── roadmap.ts       # POST /generate
+│   │   │   │   └── suno.ts          # POST /generate
+│   │   │   ├── middleware/
+│   │   │   │   ├── errorHandler.ts  # Global error handler (Zod + generic)
+│   │   │   │   ├── requestLogger.ts # HTTP request/response logger
+│   │   │   │   └── notFound.ts      # 404 JSON handler
+│   │   │   ├── schemas.ts           # Shared Zod validation schemas
+│   │   │   └── app.ts              # Hono composition root (DI wiring)
 │   │   └── index.ts                 # Server entry point
 │   ├── drizzle/                     # Generated SQL migrations
 │   ├── drizzle.config.ts            # Drizzle Kit config
@@ -99,6 +116,7 @@ neurotube-creator/
 | `client/src/pages/IndexPage.vue` | Home page — search, idea list |
 | `client/src/pages/PlanPage.vue` | Video plan viewer with AI tools |
 | `server/src/presentation/app.ts` | Hono app composition root (DI wiring) |
+| `server/src/presentation/schemas.ts` | Shared Zod validation schemas |
 | `server/src/domain/ports/IAiService.ts` | AI service interface |
 | `server/src/infrastructure/ai/GeminiAiService.ts` | Gemini API implementation |
 | `server/src/application/use-cases/index.ts` | All 12 use cases (barrel exports) |
@@ -110,14 +128,21 @@ neurotube-creator/
 ## API Routes
 | Method | Path | Description |
 |--------|------|-------------|
+| GET | `/api/health` | Health check |
 | POST | `/api/ideas/generate` | Generate 5 video ideas |
+| GET | `/api/ideas` | List saved ideas |
 | POST | `/api/plans/generate` | Generate full video plan |
+| GET | `/api/plans` | List saved plans |
 | POST | `/api/thumbnails/generate` | Generate thumbnail image |
 | POST | `/api/titles/generate` | Generate alternative titles |
 | POST | `/api/descriptions/generate` | Generate YouTube description |
 | POST | `/api/branding/generate` | Generate channel branding |
 | POST | `/api/analysis/niche` | Analyze niche (web grounded) |
-| GET | `/api/health` | Health check |
+| POST | `/api/notebooklm/generate` | Generate NotebookLM source doc |
+| POST | `/api/shorts/generate` | Generate Shorts spinoffs |
+| POST | `/api/monetization/generate` | Generate monetization copy |
+| POST | `/api/roadmap/generate` | Generate 30-day content roadmap |
+| POST | `/api/suno/generate` | Generate Suno.ai music prompt |
 
 ## Key Patterns
 - **Clean Architecture** — domain defines interfaces, infrastructure implements them

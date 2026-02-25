@@ -1,15 +1,17 @@
 import { describe, it, expect } from 'vitest';
-import { createApp } from '../../app.js';
+import { Hono } from 'hono';
+import { health } from '../health.js';
 
 describe('GET /api/health', () => {
-  const app = createApp();
+  const app = new Hono();
+  app.route('/api/health', health);
 
   it('should return 200 with status ok', async () => {
     const res = await app.request('/api/health');
 
     expect(res.status).toBe(200);
 
-    const body = await res.json();
+    const body = await res.json() as Record<string, unknown>;
     expect(body.status).toBe('ok');
     expect(body.timestamp).toBeDefined();
     expect(typeof body.uptime).toBe('number');
