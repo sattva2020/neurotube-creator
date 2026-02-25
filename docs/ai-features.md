@@ -190,6 +190,34 @@ IndexPage → generate ideas → select idea
 - Контент оптимизирован для англоязычной аудитории (высокий CPM)
 - Пояснения для автора на русском (удобство работы)
 
+## Data Persistence
+
+Сгенерированные идеи и планы автоматически сохраняются в PostgreSQL и доступны для повторного просмотра.
+
+### CRUD Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/ideas` | Все идеи (опционально `?niche=psychology`) |
+| `GET` | `/api/ideas/:id` | Идея по UUID |
+| `DELETE` | `/api/ideas/:id` | Удалить идею |
+| `GET` | `/api/plans` | Все планы (опционально `?niche=ambient`) |
+| `GET` | `/api/plans/:id` | План по UUID |
+| `DELETE` | `/api/plans/:id` | Удалить план |
+
+### Client Composables
+
+| Composable | Methods | State |
+|------------|---------|-------|
+| `useIdeasHistory` | `fetchAll(niche?)`, `fetchById(id)`, `remove(id)` | `history`, `isLoading`, `error` |
+| `usePlansHistory` | `fetchAll(niche?)`, `fetchById(id)`, `remove(id)` | `history`, `isLoading`, `error` |
+
+### Page Integration
+
+- **IndexPage** — загружает историю идей на `onMounted`, перезагружает при смене ниши, кнопка удаления на каждой записи
+- **PlanPage** — поддерживает deep-link `/plan/:id` для загрузки плана из БД; fallback на генерацию из выбранной идеи
+- **Niche store** — сохраняет выбор ниши в `localStorage` (ключ: `neurotube-niche`)
+
 ## See Also
 
 - [Architecture](architecture.md) — data flow и структура сервисов
