@@ -1,4 +1,4 @@
-# --- Makefile for NeuroTube Creator ---
+# --- Makefile for NeuroTube Creator (Monorepo) ---
 # Usage: make [target]
 
 SHELL := bash
@@ -32,34 +32,60 @@ DOCKER_TAG   ?= $(VERSION)
 ##@ Development
 
 .PHONY: install
-install: ## Install dependencies
+install: ## Install all workspace dependencies
 	$(PM) install
 
 .PHONY: dev
-dev: ## Start development server (port 3000)
+dev: ## Start client (port 9000) + server (port 3000) concurrently
 	$(PM) run dev
 
+.PHONY: dev-client
+dev-client: ## Start only the Vue/Quasar client (port 9000)
+	$(PM) run dev:client
+
+.PHONY: dev-server
+dev-server: ## Start only the Hono server (port 3000)
+	$(PM) run dev:server
+
 .PHONY: build
-build: ## Build for production
+build: ## Build all packages (shared → server → client)
 	$(PM) run build
 
-.PHONY: preview
-preview: ## Preview production build locally
-	$(PM) run preview
+.PHONY: build-client
+build-client: ## Build only the client
+	$(PM) run build:client
+
+.PHONY: build-server
+build-server: ## Build only the server
+	$(PM) run build:server
+
+.PHONY: build-shared
+build-shared: ## Build only the shared types
+	$(PM) run build:shared
 
 ##@ Code Quality
 
 .PHONY: lint
-lint: ## Run TypeScript type checking
+lint: ## Run TypeScript type checking across all packages
 	$(PM) run lint
 
 .PHONY: check
 check: lint build ## Run all checks (lint + build)
 
+##@ Database
+
+.PHONY: db-generate
+db-generate: ## Generate Drizzle migration files
+	$(PM) run db:generate -w @neurotube/server
+
+.PHONY: db-migrate
+db-migrate: ## Run Drizzle migrations
+	$(PM) run db:migrate -w @neurotube/server
+
 ##@ Docker
 
 .PHONY: docker-build
-docker-build: ## Build Docker image
+docker-build: ## Build Docker image (multi-stage: client + server)
 	docker build \
 		--build-arg VERSION=$(VERSION) \
 		--build-arg COMMIT=$(COMMIT) \
@@ -114,24 +140,24 @@ ci: install lint build ## Run full CI pipeline (install + lint + build)
 ##@ Cleanup
 
 .PHONY: clean
-clean: ## Remove build artifacts
-	$(PM) run clean
+clean: ## Remove build artifacts in all workspaces
+	$(PM) run clean --workspaces --if-present
 
 .PHONY: clean-all
 clean-all: clean ## Remove everything including node_modules
-	rm -rf node_modules/
+	rm -rf node_modules/ client/node_modules/ server/node_modules/ shared/node_modules/
 
 ##@ Info
 
 .PHONY: info
 info: ## Show project info
-	@echo "Project:  $(PROJECT)"
-	@echo "Version:  $(VERSION)"
-	@echo "Commit:   $(COMMIT)"
-	@echo "Built:    $(BUILD_TIME)"
-	@echo "Node:     $$(node -v)"
-	@echo "npm:      $$(npm -v)"
-	@echo "PM:       $(PM)"
+	@echo "Project:    $(PROJECT)"
+	@echo "Version:    $(VERSION)"
+	@echo "Commit:     $(COMMIT)"
+	@echo "Built:      $(BUILD_TIME)"
+	@echo "Node:       $$(node -v)"
+	@echo "npm:        $$(npm -v)"
+	@echo "Workspaces: client, server, shared"
 
 ##@ Help
 

@@ -11,12 +11,12 @@ Generate viral video ideas, full production plans, thumbnails, channel branding,
 ## Quick Start
 
 ```bash
-npm install
+npm install                                    # install all workspace dependencies
 echo 'GEMINI_API_KEY="your-key-here"' > .env.local
-npm run dev
+npm run dev                                    # start client (port 9000) + server (port 3000)
 ```
 
-Open `http://localhost:3000` and start generating.
+Open `http://localhost:9000` and start generating.
 
 ## Key Features
 
@@ -35,7 +35,7 @@ Open `http://localhost:3000` and start generating.
 
 ## Tech Stack
 
-React 19 · TypeScript · Vite 6 · Tailwind CSS v4 · Google Gemini API · Lucide Icons
+**Monorepo** (npm workspaces) · Vue 3 + Quasar (client) · Hono (server) · PostgreSQL + Drizzle ORM · Google Gemini API · TypeScript
 
 ---
 

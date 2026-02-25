@@ -31,51 +31,44 @@ NeuroTube Creator — AI-powered YouTube idea generator and script outliner for 
 
 See `.ai-factory/ARCHITECTURE.md` for full details.
 
-## Project Structure (target)
+## Project Structure (current)
 ```
 neurotube-creator/
-├── client/                       # Frontend — Vue 3 + Quasar
-│   ├── src/
-│   │   ├── pages/                # Route pages (IndexPage, PlanPage)
-│   │   ├── layouts/              # App layouts (MainLayout)
-│   │   ├── components/           # Reusable Vue components
-│   │   ├── composables/          # Vue composables (useGenerateIdeas, etc.)
-│   │   ├── stores/               # Pinia stores (ideas, plan, niche)
-│   │   ├── types/                # TypeScript types
-│   │   └── router/               # Vue Router config
-│   ├── quasar.config.ts
-│   └── package.json
+├── client/                          # Frontend — Vue 3 + Quasar
+│   ├── src/                         # (to be created — new Vue frontend)
+│   ├── src-legacy/                  # Legacy React SPA (reference for migration)
+│   │   ├── App.tsx
+│   │   ├── components/
+│   │   ├── services/geminiService.ts
+│   │   └── utils/
+│   ├── package.json                 # @neurotube/client
+│   └── tsconfig.json
 │
-├── server/                       # Backend — Hono + Clean Architecture
-│   ├── src/
-│   │   ├── domain/               # Entities + ports (zero dependencies)
-│   │   ├── application/          # Use cases (depends on domain)
-│   │   ├── infrastructure/       # Gemini SDK, Drizzle ORM, config
-│   │   └── presentation/         # Hono routes, middleware
-│   ├── drizzle.config.ts
-│   └── package.json
+├── server/                          # Backend — Hono + Clean Architecture
+│   ├── src/                         # (to be created — domain, application, infrastructure, presentation)
+│   ├── package.json                 # @neurotube/server
+│   └── tsconfig.json
 │
-├── shared/                       # Shared TypeScript types
-│   └── types/
+├── shared/                          # Shared TypeScript types
+│   ├── types/
+│   │   ├── index.ts                 # Barrel exports
+│   │   ├── idea.ts                  # VideoIdea, Niche
+│   │   └── api.ts                   # ApiResponse, ApiError
+│   ├── package.json                 # @neurotube/shared
+│   └── tsconfig.json
 │
-├── src/                          # [LEGACY] Current React SPA (to be migrated)
-│   ├── App.tsx
-│   ├── components/
-│   ├── services/geminiService.ts
-│   └── utils/
-│
-├── Dockerfile                    # Multi-stage build
-├── docker-compose.yml            # Local dev (app + postgres)
-├── Makefile                      # Build automation
-├── .github/workflows/ci.yml     # CI pipeline
-└── package.json                  # Root workspace
+├── tsconfig.json                    # Root — project references
+├── tsconfig.base.json               # Shared compiler options
+├── Makefile                         # Build automation (monorepo)
+├── .github/workflows/ci.yml        # CI pipeline
+└── package.json                     # Root workspace (npm workspaces)
 ```
 
-## Key Entry Points (current — legacy React)
+## Key Entry Points (legacy React — in client/src-legacy/)
 | File | Purpose |
 |------|---------|
-| `src/App.tsx` | Main React component (to be migrated to Vue) |
-| `src/services/geminiService.ts` | All AI API calls — 12 functions (to move to server/) |
+| `client/src-legacy/App.tsx` | Main React component (reference for Vue migration) |
+| `client/src-legacy/services/geminiService.ts` | All AI API calls — 12 functions (to move to server/) |
 
 ## Key Entry Points (target — fullstack)
 | File | Purpose |

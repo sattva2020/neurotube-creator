@@ -5,7 +5,7 @@
 ## Milestones
 
 - [x] **Project Setup & Architecture Planning** — AI Factory context, DESCRIPTION.md, ARCHITECTURE.md, AGENTS.md, docs, Makefile, CI
-- [ ] **Git Repository & Monorepo Workspace** — git init, npm workspaces (client/, server/, shared/), root tsconfig
+- [x] **Git Repository & Monorepo Workspace** — git init, npm workspaces (client/, server/, shared/), root tsconfig
 - [ ] **Backend Foundation (Hono + Domain)** — server/ scaffold, Hono app, domain entities, ports (IAiService, repositories)
 - [ ] **AI Service Migration** — перенос 12 промптов из geminiService.ts в GeminiAiService (infrastructure)
 - [ ] **Use Cases & Application Layer** — 12 use cases (GenerateIdeas, GeneratePlan, GenerateThumbnail, etc.)
@@ -24,3 +24,4 @@
 | Milestone | Date |
 |-----------|------|
 | Project Setup & Architecture Planning | 2026-02-25 |
+| Git Repository & Monorepo Workspace | 2026-02-25 |
