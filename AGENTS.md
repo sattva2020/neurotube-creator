@@ -45,7 +45,20 @@ neurotube-creator/
 │   └── tsconfig.json
 │
 ├── server/                          # Backend — Hono + Clean Architecture
-│   ├── src/                         # (to be created — domain, application, infrastructure, presentation)
+│   ├── src/
+│   │   ├── domain/
+│   │   │   ├── entities/            # VideoIdea, VideoPlan, ChannelBranding, Niche
+│   │   │   └── ports/               # IAiService, IIdeaRepository, IPlanRepository
+│   │   ├── infrastructure/
+│   │   │   ├── ai/
+│   │   │   │   └── GeminiAiService.ts  # Implements IAiService (12 methods)
+│   │   │   ├── config/env.ts        # Zod-validated environment config
+│   │   │   └── logger.ts            # Structured logger (LOG_LEVEL)
+│   │   ├── presentation/
+│   │   │   ├── routes/health.ts     # GET /api/health
+│   │   │   ├── middleware/errorHandler.ts
+│   │   │   └── app.ts              # Hono composition root
+│   │   └── index.ts                 # Server entry point
 │   ├── package.json                 # @neurotube/server
 │   └── tsconfig.json
 │

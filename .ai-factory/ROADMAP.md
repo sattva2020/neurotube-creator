@@ -6,8 +6,8 @@
 
 - [x] **Project Setup & Architecture Planning** — AI Factory context, DESCRIPTION.md, ARCHITECTURE.md, AGENTS.md, docs, Makefile, CI
 - [x] **Git Repository & Monorepo Workspace** — git init, npm workspaces (client/, server/, shared/), root tsconfig
-- [ ] **Backend Foundation (Hono + Domain)** — server/ scaffold, Hono app, domain entities, ports (IAiService, repositories)
-- [ ] **AI Service Migration** — перенос 12 промптов из geminiService.ts в GeminiAiService (infrastructure)
+- [x] **Backend Foundation (Hono + Domain)** — server/ scaffold, Hono app, domain entities, ports (IAiService, repositories)
+- [x] **AI Service Migration** — перенос 12 промптов из geminiService.ts в GeminiAiService (infrastructure)
 - [ ] **Use Cases & Application Layer** — 12 use cases (GenerateIdeas, GeneratePlan, GenerateThumbnail, etc.)
 - [ ] **Database Layer (PostgreSQL + Drizzle)** — schema, migrations, repository implementations, docker-compose для локальной БД
 - [ ] **API Routes & Middleware** — Hono routes с Zod-валидацией, CORS, rate limiter, error handler, health check
@@ -25,3 +25,5 @@
 |-----------|------|
 | Project Setup & Architecture Planning | 2026-02-25 |
 | Git Repository & Monorepo Workspace | 2026-02-25 |
+| Backend Foundation (Hono + Domain) | 2026-02-25 |
+| AI Service Migration | 2026-02-25 |
