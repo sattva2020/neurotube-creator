@@ -56,10 +56,10 @@
 
 ### Phase 3: Dialog Components
 
-- [ ] **Task 4:** ThumbnailDialog.vue — image generation *(blocked by: Tasks 2, 3)*
-- [ ] **Task 5:** TitlesDialog.vue — title list with copy *(blocked by: Tasks 2, 3)*
-- [ ] **Task 6:** BrandingDialog.vue — structured branding display *(blocked by: Tasks 2, 3)*
-- [ ] **Task 7:** MarkdownToolDialog.vue — generic dialog for 7 markdown tools *(blocked by: Tasks 2, 3)*
+- [x] **Task 4:** ThumbnailDialog.vue — image generation *(blocked by: Tasks 2, 3)*
+- [x] **Task 5:** TitlesDialog.vue — title list with copy *(blocked by: Tasks 2, 3)*
+- [x] **Task 6:** BrandingDialog.vue — structured branding display *(blocked by: Tasks 2, 3)*
+- [x] **Task 7:** MarkdownToolDialog.vue — generic dialog for 7 markdown tools *(blocked by: Tasks 2, 3)*
 
 ### Phase 4: Page Integration
 
