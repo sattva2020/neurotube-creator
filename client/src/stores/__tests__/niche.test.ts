@@ -4,6 +4,7 @@ import { useNicheStore } from '../niche';
 
 describe('useNicheStore', () => {
   beforeEach(() => {
+    localStorage.clear();
     setActivePinia(createPinia());
   });
 

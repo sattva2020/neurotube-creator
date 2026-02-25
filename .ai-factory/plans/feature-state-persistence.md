@@ -97,7 +97,7 @@ feat(client): add persistence composables and fix plan store
 
 ## Phase 3: UI Integration
 
-### Task 9: Update IndexPage to load saved ideas on mount
+### ~~Task 9: Update IndexPage to load saved ideas on mount~~ [x]
 - File: `client/src/pages/IndexPage.vue`
 - Call `useIdeasHistory.fetchAll()` on mount
 - Add history section (tabs or expansion) below generation form
@@ -105,13 +105,13 @@ feat(client): add persistence composables and fix plan store
 - Reload history when niche changes
 - Blocked by: Task 7
 
-### Task 10: Update PlanPage to support :id route param
+### ~~Task 10: Update PlanPage to support :id route param~~ [x]
 - File: `client/src/pages/PlanPage.vue`
 - If `route.params.id` present → fetch from DB via usePlansHistory.fetchById
 - Fallback to existing behavior (generate from selected idea)
 - Blocked by: Task 8
 
-### Task 11: Persist niche preference to localStorage
+### ~~Task 11: Persist niche preference to localStorage~~ [x]
 - File: `client/src/stores/niche.ts`
 - Read from localStorage on init, write on change
 - Key: `neurotube-niche`

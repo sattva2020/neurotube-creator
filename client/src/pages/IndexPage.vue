@@ -97,16 +97,62 @@
         />
       </div>
     </div>
+
+    <!-- Saved Ideas History -->
+    <div v-if="!ideasStore.items.length" style="max-width: 640px; margin: 0 auto">
+      <div class="row items-center justify-between q-mb-md">
+        <span class="text-h6">Сохранённые Идеи</span>
+        <q-spinner-dots v-if="historyLoading" color="primary" size="24px" />
+        <q-badge v-else color="grey-3" text-color="grey-8" rounded>
+          {{ ideasHistory.length }}
+        </q-badge>
+      </div>
+
+      <div v-if="historyError" class="text-negative q-mb-md">
+        {{ historyError }}
+      </div>
+
+      <div v-if="!historyLoading && ideasHistory.length === 0" class="text-center text-grey-5 q-pa-xl">
+        <q-icon name="lightbulb" size="48px" class="q-mb-sm" />
+        <div>Пока нет сохранённых идей. Сгенерируйте свои первые!</div>
+      </div>
+
+      <div v-else class="column q-gutter-md">
+        <IdeaCard
+          v-for="idea in ideasHistory"
+          :key="idea.id"
+          :idea="idea"
+          :is-selected="ideasStore.selected?.title === idea.title"
+          @select="onSelectIdea"
+          @generate-plan="onGeneratePlan"
+        >
+          <template #actions>
+            <q-btn
+              flat
+              round
+              dense
+              icon="delete"
+              color="negative"
+              size="sm"
+              @click.stop="onDeleteIdea(idea.id!)"
+            >
+              <q-tooltip>Удалить</q-tooltip>
+            </q-btn>
+          </template>
+        </IdeaCard>
+      </div>
+    </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import type { VideoIdea } from '@neurotube/shared';
 import { useNicheStore } from '@/stores/niche';
 import { useIdeasStore } from '@/stores/ideas';
 import { useGenerateIdeas } from '@/composables/useGenerateIdeas';
+import { useIdeasHistory } from '@/composables/useIdeasHistory';
 import NicheToggle from '@/components/NicheToggle.vue';
 import IdeaCard from '@/components/IdeaCard.vue';
 
@@ -133,6 +179,13 @@ const router = useRouter();
 const nicheStore = useNicheStore();
 const ideasStore = useIdeasStore();
 const { generate } = useGenerateIdeas();
+const {
+  history: ideasHistory,
+  isLoading: historyLoading,
+  error: historyError,
+  fetchAll: fetchHistory,
+  remove: removeIdea,
+} = useIdeasHistory();
 
 const topic = ref('');
 const error = ref('');
@@ -161,8 +214,24 @@ function onGeneratePlan(idea: VideoIdea) {
   router.push({ name: 'plan' });
 }
 
+async function onDeleteIdea(id: string) {
+  console.debug('[IndexPage] Delete idea:', id);
+  try {
+    await removeIdea(id);
+  } catch {
+    console.error('[IndexPage] Failed to delete idea:', id);
+  }
+}
+
+// Load history on mount and when niche changes
 onMounted(() => {
   console.debug('[IndexPage] Mounted, niche:', nicheStore.active);
+  fetchHistory(nicheStore.active);
+});
+
+watch(() => nicheStore.active, (niche) => {
+  console.debug('[IndexPage] Niche changed, reloading history:', niche);
+  fetchHistory(niche);
 });
 </script>
 
