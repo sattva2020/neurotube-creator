@@ -63,7 +63,7 @@
 
 ### Phase 4: Page Integration
 
-- [ ] **Task 8:** ToolsPage.vue + route + navigation links *(blocked by: Tasks 4, 5, 6, 7)*
+- [x] **Task 8:** ToolsPage.vue + route + navigation links *(blocked by: Tasks 4, 5, 6, 7)*
   - `client/src/pages/ToolsPage.vue`, `client/src/router/routes.ts`
   - `client/src/layouts/MainLayout.vue`, `client/src/pages/PlanPage.vue`
 

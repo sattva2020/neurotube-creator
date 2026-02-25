@@ -40,6 +40,13 @@
           </q-item-section>
           <q-item-section>Генератор идей</q-item-section>
         </q-item>
+
+        <q-item clickable to="/tools">
+          <q-item-section avatar>
+            <q-icon name="build" />
+          </q-item-section>
+          <q-item-section>AI-инструменты</q-item-section>
+        </q-item>
       </q-list>
     </q-drawer>
 

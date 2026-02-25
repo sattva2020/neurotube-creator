@@ -53,6 +53,16 @@
 
       <!-- eslint-disable-next-line vue/no-v-html -->
       <div class="plan-markdown text-body1" v-html="renderedMarkdown" />
+
+      <!-- AI Tools button -->
+      <q-separator class="q-my-lg" />
+      <q-btn
+        color="primary"
+        icon="build"
+        label="AI-инструменты"
+        no-caps
+        @click="router.push({ name: 'tools' })"
+      />
     </div>
   </q-page>
 </template>
