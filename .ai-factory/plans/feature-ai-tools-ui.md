@@ -69,10 +69,10 @@
 
 ### Phase 5: Tests
 
-- [ ] **Task 9:** Tests for 10 composables *(blocked by: Task 3)*
+- [x] **Task 9:** Tests for 10 composables *(blocked by: Task 3)*
   - `client/src/composables/__tests__/use*.test.ts` (10 files)
 
-- [ ] **Task 10:** Tests for components and ToolsPage *(blocked by: Task 8)*
+- [x] **Task 10:** Tests for components and ToolsPage *(blocked by: Task 8)*
   - `client/src/components/__tests__/{ToolCard,MarkdownResult,ThumbnailDialog,TitlesDialog,BrandingDialog,MarkdownToolDialog}.test.ts`
   - `client/src/pages/__tests__/ToolsPage.test.ts`
 
