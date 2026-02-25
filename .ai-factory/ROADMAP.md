@@ -8,7 +8,7 @@
 - [x] **Git Repository & Monorepo Workspace** — git init, npm workspaces (client/, server/, shared/), root tsconfig
 - [x] **Backend Foundation (Hono + Domain)** — server/ scaffold, Hono app, domain entities, ports (IAiService, repositories)
 - [x] **AI Service Migration** — перенос 12 промптов из geminiService.ts в GeminiAiService (infrastructure)
-- [ ] **Use Cases & Application Layer** — 12 use cases (GenerateIdeas, GeneratePlan, GenerateThumbnail, etc.)
+- [x] **Use Cases & Application Layer** — 12 use cases (GenerateIdeas, GeneratePlan, GenerateThumbnail, etc.)
 - [ ] **Database Layer (PostgreSQL + Drizzle)** — schema, migrations, repository implementations, docker-compose для локальной БД
 - [ ] **API Routes & Middleware** — Hono routes с Zod-валидацией, CORS, rate limiter, error handler, health check
 - [ ] **Frontend Foundation (Vue 3 + Quasar)** — client/ scaffold с Quasar CLI, routing, MainLayout, Pinia stores
@@ -27,3 +27,4 @@
 | Git Repository & Monorepo Workspace | 2026-02-25 |
 | Backend Foundation (Hono + Domain) | 2026-02-25 |
 | AI Service Migration | 2026-02-25 |
+| Use Cases & Application Layer | 2026-02-25 |

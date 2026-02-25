@@ -49,6 +49,9 @@ neurotube-creator/
 │   │   ├── domain/
 │   │   │   ├── entities/            # VideoIdea, VideoPlan, ChannelBranding, Niche
 │   │   │   └── ports/               # IAiService, IIdeaRepository, IPlanRepository
+│   │   ├── application/
+│   │   │   └── use-cases/           # 12 use cases (GenerateIdeas, GeneratePlan, etc.)
+│   │   │       └── index.ts         # Barrel exports for all use cases
 │   │   ├── infrastructure/
 │   │   │   ├── ai/
 │   │   │   │   └── GeminiAiService.ts  # Implements IAiService (12 methods)
@@ -91,6 +94,7 @@ neurotube-creator/
 | `server/src/presentation/app.ts` | Hono app composition root (DI wiring) |
 | `server/src/domain/ports/IAiService.ts` | AI service interface |
 | `server/src/infrastructure/ai/GeminiAiService.ts` | Gemini API implementation |
+| `server/src/application/use-cases/index.ts` | All 12 use cases (barrel exports) |
 
 ## API Routes
 | Method | Path | Description |
