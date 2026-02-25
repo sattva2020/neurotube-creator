@@ -49,7 +49,9 @@ neurotube-creator/
 │   │   ├── composables/             # Vue composables (like React hooks)
 │   │   │   ├── useGenerateIdeas.ts  # Idea generation logic + state
 │   │   │   ├── useGeneratePlan.ts   # Plan generation logic
-│   │   │   └── useApi.ts            # Base API client (fetch to backend)
+│   │   │   ├── useApi.ts            # Base API client (get, post, del)
+│   │   │   ├── useIdeasHistory.ts   # Saved ideas CRUD (fetchAll, fetchById, remove)
+│   │   │   └── usePlansHistory.ts   # Saved plans CRUD (fetchAll, fetchById, remove)
 │   │   ├── stores/                  # Pinia state management
 │   │   │   ├── ideas.ts             # Generated ideas store
 │   │   │   ├── plan.ts              # Current plan store
@@ -422,7 +424,11 @@ export const plans = pgTable('plans', {
 | POST | `/api/roadmap/generate` | GenerateRoadmap | 30-day content plan |
 | GET | `/api/health` | — | Health check |
 | GET | `/api/ideas` | — | List saved ideas |
+| GET | `/api/ideas/:id` | — | Get idea by ID |
+| DELETE | `/api/ideas/:id` | — | Delete idea by ID |
 | GET | `/api/plans` | — | List saved plans |
+| GET | `/api/plans/:id` | — | Get plan by ID |
+| DELETE | `/api/plans/:id` | — | Delete plan by ID |
 
 ## Anti-Patterns
 

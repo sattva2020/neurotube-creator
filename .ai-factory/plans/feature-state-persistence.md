@@ -129,13 +129,13 @@ feat(client): integrate data persistence into pages
 
 ## Phase 4: Tests & Docs
 
-### Task 12: Write client tests (stores, composables, pages)
+### ~~Task 12: Write client tests (stores, composables, pages)~~ [x]
 - Store tests: plan.ts (full entity), niche.ts (localStorage)
 - Composable tests: useIdeasHistory, usePlansHistory, useApi.del()
 - Page tests: IndexPage (history), PlanPage (:id param)
 - Blocked by: Tasks 9, 10, 11
 
-### Task 13: Update documentation for persistence features
+### ~~Task 13: Update documentation for persistence features~~ [x]
 - Files: `docs/architecture.md`, `docs/ai-features.md`, `.ai-factory/ARCHITECTURE.md`
 - New API endpoints table, updated data flow diagram
 - Blocked by: Task 3

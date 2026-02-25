@@ -68,6 +68,19 @@ describe('useApi', () => {
     }
   });
 
+  it('performs DELETE request', async () => {
+    mockFetch.mockResolvedValueOnce(jsonResponse({ data: { success: true } }));
+
+    const { del } = useApi();
+    const result = await del<{ success: boolean }>('/api/ideas/uuid-1');
+
+    expect(mockFetch).toHaveBeenCalledWith('/api/ideas/uuid-1', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    expect(result).toEqual({ success: true });
+  });
+
   it('throws ApiRequestError on error response without JSON body', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: false,

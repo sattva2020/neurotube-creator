@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, flushPromises } from '@vue/test-utils';
 import { setActivePinia, createPinia } from 'pinia';
 import PlanPage from '../PlanPage.vue';
 import { usePlanStore } from '@/stores/plan';
@@ -10,9 +10,10 @@ const mockFetch = vi.fn();
 vi.stubGlobal('fetch', mockFetch);
 
 const mockPush = vi.fn();
+const mockRouteParams = { id: undefined as string | undefined };
 vi.mock('vue-router', () => ({
   useRouter: () => ({ push: mockPush }),
-  useRoute: () => ({ params: {} }),
+  useRoute: () => ({ params: mockRouteParams }),
 }));
 
 vi.mock('quasar', () => ({
@@ -52,6 +53,7 @@ describe('PlanPage', () => {
     setActivePinia(createPinia());
     mockFetch.mockReset();
     mockPush.mockReset();
+    mockRouteParams.id = undefined;
   });
 
   it('shows warning when no idea selected', () => {
@@ -95,6 +97,46 @@ describe('PlanPage', () => {
   it('has back button', () => {
     const wrapper = mountPlanPage();
     expect(wrapper.text()).toContain('Назад к идеям');
+  });
+
+  it('loads plan by id from route params', async () => {
+    const mockPlan = {
+      id: 'plan-abc',
+      title: 'Loaded Plan',
+      markdown: '# Loaded from DB',
+      niche: 'psychology',
+      createdAt: '2026-01-01',
+    };
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      statusText: 'OK',
+      json: () => Promise.resolve({ data: mockPlan }),
+    });
+
+    mockRouteParams.id = 'plan-abc';
+    mountPlanPage();
+    await flushPromises();
+
+    expect(mockFetch).toHaveBeenCalledOnce();
+    const planStore = usePlanStore();
+    expect(planStore.plan?.id).toBe('plan-abc');
+    expect(planStore.markdown).toBe('# Loaded from DB');
+  });
+
+  it('shows error when plan not found by id', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 404,
+      statusText: 'Not Found',
+      json: () => Promise.resolve({ error: 'Not found', message: 'Plan not found' }),
+    });
+
+    mockRouteParams.id = 'nonexistent';
+    const wrapper = mountPlanPage();
+    await flushPromises();
+
+    expect(wrapper.text()).toContain('План не найден');
   });
 
   it('triggers plan generation on mount when idea is selected', async () => {
