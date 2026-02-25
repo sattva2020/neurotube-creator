@@ -1,14 +1,82 @@
 import 'dotenv/config';
 import { serve } from '@hono/node-server';
-import { createApp } from './presentation/app.js';
+import { env } from './infrastructure/config/env.js';
 import { createLogger } from './infrastructure/logger.js';
+import { createDbClient } from './infrastructure/db/client.js';
+import { GeminiAiService } from './infrastructure/ai/GeminiAiService.js';
+import { IdeaRepository } from './infrastructure/db/IdeaRepository.js';
+import { PlanRepository } from './infrastructure/db/PlanRepository.js';
+import { GenerateIdeas } from './application/use-cases/GenerateIdeas.js';
+import { GeneratePlan } from './application/use-cases/GeneratePlan.js';
+import { GenerateThumbnail } from './application/use-cases/GenerateThumbnail.js';
+import { GenerateTitles } from './application/use-cases/GenerateTitles.js';
+import { GenerateDescription } from './application/use-cases/GenerateDescription.js';
+import { GenerateBranding } from './application/use-cases/GenerateBranding.js';
+import { AnalyzeNiche } from './application/use-cases/AnalyzeNiche.js';
+import { GenerateNotebookLM } from './application/use-cases/GenerateNotebookLM.js';
+import { GenerateShorts } from './application/use-cases/GenerateShorts.js';
+import { GenerateMonetization } from './application/use-cases/GenerateMonetization.js';
+import { GenerateRoadmap } from './application/use-cases/GenerateRoadmap.js';
+import { GenerateSunoPrompt } from './application/use-cases/GenerateSunoPrompt.js';
+import { createApp } from './presentation/app.js';
 
 const logger = createLogger('Server');
 
-const app = createApp();
+// --- Infrastructure ---
+logger.debug('Wiring infrastructure layer');
 
-const port = Number(process.env.PORT) || 3000;
+const { db, sql } = createDbClient(env.DATABASE_URL);
+const aiService = new GeminiAiService(env.GEMINI_API_KEY);
+const ideaRepo = new IdeaRepository(db);
+const planRepo = new PlanRepository(db);
 
-serve({ fetch: app.fetch, port }, () => {
-  logger.info(`Server started on http://localhost:${port}`);
+// --- Use cases ---
+logger.debug('Wiring application use cases');
+
+const generateIdeas = new GenerateIdeas(aiService, ideaRepo);
+const generatePlan = new GeneratePlan(aiService, planRepo);
+const generateThumbnail = new GenerateThumbnail(aiService);
+const generateTitles = new GenerateTitles(aiService);
+const generateDescription = new GenerateDescription(aiService);
+const generateBranding = new GenerateBranding(aiService);
+const analyzeNiche = new AnalyzeNiche(aiService);
+const generateNotebookLM = new GenerateNotebookLM(aiService);
+const generateShorts = new GenerateShorts(aiService);
+const generateMonetization = new GenerateMonetization(aiService);
+const generateRoadmap = new GenerateRoadmap(aiService);
+const generateSunoPrompt = new GenerateSunoPrompt(aiService);
+
+// --- Presentation ---
+const app = createApp({
+  generateIdeas,
+  generatePlan,
+  generateThumbnail,
+  generateTitles,
+  generateDescription,
+  generateBranding,
+  analyzeNiche,
+  generateNotebookLM,
+  generateShorts,
+  generateMonetization,
+  generateRoadmap,
+  generateSunoPrompt,
+  ideaRepo,
+  planRepo,
 });
+
+// --- Start server ---
+const server = serve({ fetch: app.fetch, port: env.PORT }, () => {
+  logger.info(`Server started on http://localhost:${env.PORT}`);
+});
+
+// --- Graceful shutdown ---
+async function shutdown(signal: string) {
+  logger.info(`Received ${signal}, shutting down gracefully`);
+  server.close();
+  await sql.end();
+  logger.info('Server shut down complete');
+  process.exit(0);
+}
+
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGTERM', () => shutdown('SIGTERM'));
