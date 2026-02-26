@@ -23,10 +23,10 @@
 - [x] **Auth Domain & Database Schema** — User/Role/Session entities, ports (IUserRepository, IAuthService), Drizzle-схема (users, roles, sessions), миграции
 - [x] **Auth Backend (Hono)** — JWT-сервис, bcrypt хеширование, auth middleware, маршруты login/register/logout/refresh, Zod-валидация
 - [x] **Role-Based Access Control (RBAC)** — 4-ролевая модель (Owner → Admin → Editor → Viewer), permission-система, ролевые middleware, защита API-маршрутов
-- [ ] **Auth Frontend (Vue 3 + Quasar)** — Login/Register страницы, Pinia auth store, route guards, token management, useAuth composable
+- [x] **Auth Frontend (Vue 3 + Quasar)** — Login/Register страницы, Pinia auth store, route guards, token management, useAuth composable
 - [ ] **User-Scoped Data** — userId в таблицах ideas/plans, миграция, фильтрация данных по пользователю, обновление репозиториев
 - [ ] **Admin Panel** — Управление пользователями, назначение ролей, просмотр активности, административный дашборд
-- [ ] **Auth E2E Testing** — Playwright-тесты для авторизации: регистрация, логин, защищённые маршруты, RBAC
+- [x] **Auth E2E Testing** — Playwright-тесты для авторизации: регистрация, логин, защищённые маршруты, RBAC
 
 ## Completed
 
@@ -51,3 +51,5 @@
 | Auth Domain & Database Schema | 2026-02-26 |
 | Auth Backend (Hono) | 2026-02-26 |
 | Role-Based Access Control (RBAC) | 2026-02-26 |
+| Auth Frontend (Vue 3 + Quasar) | 2026-02-26 |
+| Auth E2E Testing | 2026-02-26 |
