@@ -1,5 +1,5 @@
 # ---- Base ----
-FROM node:22-alpine AS base
+FROM node:22-slim AS base
 WORKDIR /app
 
 ARG VERSION=dev
@@ -12,7 +12,7 @@ LABEL org.opencontainers.image.source="https://github.com/neurotube/creator"
 
 # ---- Dependencies ----
 FROM base AS deps
-RUN apk add --no-cache python3 make g++ git libc6-compat
+RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
 COPY package.json package-lock.json ./
 COPY client/package.json ./client/
 COPY server/package.json ./server/
@@ -37,7 +37,7 @@ COPY client/ ./client/
 RUN npm run build:client
 
 # ---- Production ----
-FROM node:22-alpine AS production
+FROM node:22-slim AS production
 WORKDIR /app
 
 ARG VERSION=dev
