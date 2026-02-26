@@ -26,15 +26,12 @@ RUN npm run build:client
 COPY server/drizzle/ ./server/drizzle/
 COPY server/drizzle.config.ts ./server/
 
+# Copy entrypoint for DB migrations
+COPY docker-entrypoint.sh ./
+RUN chmod +x docker-entrypoint.sh
+
 ENV NODE_ENV=production
 ENV PORT=3000
 EXPOSE 3000
 
-# Wrapper: catch startup errors, keep container alive for diagnostics
-CMD ["node", "-e", "\
-process.on('uncaughtException', e => { console.error('FATAL:', e); });\
-process.on('unhandledRejection', e => { console.error('UNHANDLED:', e); });\
-console.log('Starting server...');\
-console.log('ENV check:', { NODE_ENV: process.env.NODE_ENV, PORT: process.env.PORT, HAS_DB: !!process.env.DATABASE_URL, HAS_GEMINI: !!process.env.GEMINI_API_KEY, HAS_JWT: !!process.env.JWT_SECRET });\
-import('./server/dist/index.js').catch(e => { console.error('IMPORT FAILED:', e); process.exit(1); });\
-"]
+ENTRYPOINT ["./docker-entrypoint.sh"]
