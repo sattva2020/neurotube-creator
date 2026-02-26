@@ -4,7 +4,7 @@ import type { GeneratePlan } from '../../application/use-cases/GeneratePlan.js';
 import type { ExportPlan } from '../../application/use-cases/ExportPlan.js';
 import type { IPlanRepository } from '../../domain/ports/IPlanRepository.js';
 import type { Niche } from '../../domain/entities/Niche.js';
-import type { ExportFormat } from '../../../../shared/types/export.js';
+import type { ExportFormat } from '@neurotube/shared/export';
 import type { AuthVariables } from '../middleware/authMiddleware.js';
 import { generatePlanSchema, listPlansQuerySchema, uuidParamSchema, exportPlanQuerySchema } from '../schemas.js';
 import { createLogger } from '../../infrastructure/logger.js';

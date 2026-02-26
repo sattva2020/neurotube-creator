@@ -1,6 +1,6 @@
 import type { IPlanRepository } from '../../domain/ports/IPlanRepository.js';
 import type { IDocumentExporter } from '../../domain/ports/IDocumentExporter.js';
-import type { ExportFormat, ExportResult } from '../../../../shared/types/export.js';
+import type { ExportFormat, ExportResult } from '@neurotube/shared/export';
 import { createLogger } from '../../infrastructure/logger.js';
 
 const logger = createLogger('ExportPlan');

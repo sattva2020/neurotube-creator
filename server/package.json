@@ -15,6 +15,7 @@
     "db:migrate": "drizzle-kit migrate"
   },
   "dependencies": {
+    "@neurotube/shared": "*",
     "@google/genai": "^1.29.0",
     "@hono/node-server": "^1.14.3",
     "@hono/zod-validator": "^0.5.0",
@@ -31,7 +32,6 @@
     "zod": "^3.24.5"
   },
   "devDependencies": {
-    "@neurotube/shared": "*",
     "@types/bcryptjs": "^2.4.6",
     "@types/markdown-it": "^14.1.2",
     "@types/pdfkit": "^0.17.5",

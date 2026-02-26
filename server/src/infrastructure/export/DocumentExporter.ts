@@ -10,7 +10,7 @@ import {
   BorderStyle,
 } from 'docx';
 import type { IDocumentExporter } from '../../domain/ports/IDocumentExporter.js';
-import type { ExportFormat, ExportResult } from '../../../../shared/types/export.js';
+import type { ExportFormat, ExportResult } from '@neurotube/shared/export';
 import { createLogger } from '../logger.js';
 
 const logger = createLogger('DocumentExporter');
