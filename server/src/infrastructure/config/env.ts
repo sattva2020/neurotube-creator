@@ -12,7 +12,7 @@ const envSchema = z.object({
   STATIC_DIR: z.string().optional(),
   POSTHOG_API_KEY: z.string().optional().default(''),
   POSTHOG_HOST: z.string().optional().default('https://us.i.posthog.com'),
-  JWT_SECRET: z.string().optional().default(''),
+  JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
   JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
   JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
 });

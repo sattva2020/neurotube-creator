@@ -100,3 +100,28 @@ export const generateSunoSchema = z.object({
   videoTitle: titleSchema,
   planMarkdown: planMarkdownSchema,
 });
+
+// --- Auth schemas ---
+
+/** POST /api/auth/register */
+export const registerSchema = z.object({
+  email: z.string().email('Invalid email format'),
+  password: z.string().min(8, 'Password must be at least 8 characters').max(128, 'Password must not exceed 128 characters'),
+  displayName: z.string().min(1, 'Display name is required').max(100),
+});
+
+/** POST /api/auth/login */
+export const loginSchema = z.object({
+  email: z.string().email('Invalid email format'),
+  password: z.string().min(1, 'Password is required').max(128, 'Password must not exceed 128 characters'),
+});
+
+/** POST /api/auth/refresh */
+export const refreshSchema = z.object({
+  refreshToken: z.string().min(1, 'Refresh token is required'),
+});
+
+/** POST /api/auth/logout */
+export const logoutSchema = z.object({
+  refreshToken: z.string().min(1, 'Refresh token is required'),
+});

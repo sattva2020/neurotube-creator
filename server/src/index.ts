@@ -6,6 +6,10 @@ import { createDbClient } from './infrastructure/db/client.js';
 import { GeminiAiService } from './infrastructure/ai/GeminiAiService.js';
 import { IdeaRepository } from './infrastructure/db/IdeaRepository.js';
 import { PlanRepository } from './infrastructure/db/PlanRepository.js';
+import { UserRepository } from './infrastructure/db/UserRepository.js';
+import { SessionRepository } from './infrastructure/db/SessionRepository.js';
+import { BcryptHasher } from './infrastructure/auth/BcryptHasher.js';
+import { JwtService } from './infrastructure/auth/JwtService.js';
 import { GenerateIdeas } from './application/use-cases/GenerateIdeas.js';
 import { GeneratePlan } from './application/use-cases/GeneratePlan.js';
 import { GenerateThumbnail } from './application/use-cases/GenerateThumbnail.js';
@@ -18,6 +22,10 @@ import { GenerateShorts } from './application/use-cases/GenerateShorts.js';
 import { GenerateMonetization } from './application/use-cases/GenerateMonetization.js';
 import { GenerateRoadmap } from './application/use-cases/GenerateRoadmap.js';
 import { GenerateSunoPrompt } from './application/use-cases/GenerateSunoPrompt.js';
+import { Register } from './application/use-cases/Register.js';
+import { Login } from './application/use-cases/Login.js';
+import { RefreshTokens } from './application/use-cases/RefreshTokens.js';
+import { Logout } from './application/use-cases/Logout.js';
 import { PostHogService } from './infrastructure/analytics/index.js';
 import { createApp } from './presentation/app.js';
 
@@ -31,6 +39,11 @@ const aiService = new GeminiAiService(env.GEMINI_API_KEY);
 const ideaRepo = new IdeaRepository(db);
 const planRepo = new PlanRepository(db);
 const analytics = new PostHogService(env.POSTHOG_API_KEY, env.POSTHOG_HOST);
+const userRepo = new UserRepository(db);
+const sessionRepo = new SessionRepository(db);
+const passwordHasher = new BcryptHasher();
+const tokenService = new JwtService(env.JWT_SECRET, env.JWT_ACCESS_EXPIRES_IN);
+logger.debug('Auth infrastructure initialized');
 
 // --- Use cases ---
 logger.debug('Wiring application use cases');
@@ -47,6 +60,11 @@ const generateShorts = new GenerateShorts(aiService);
 const generateMonetization = new GenerateMonetization(aiService);
 const generateRoadmap = new GenerateRoadmap(aiService);
 const generateSunoPrompt = new GenerateSunoPrompt(aiService);
+const register = new Register(userRepo, passwordHasher, sessionRepo, tokenService, env.JWT_REFRESH_EXPIRES_IN);
+const login = new Login(userRepo, passwordHasher, sessionRepo, tokenService, env.JWT_REFRESH_EXPIRES_IN);
+const refreshTokens = new RefreshTokens(sessionRepo, userRepo, tokenService, env.JWT_REFRESH_EXPIRES_IN);
+const logout = new Logout(sessionRepo);
+logger.debug('Auth use cases initialized');
 
 // --- Presentation ---
 const app = createApp({
@@ -65,6 +83,12 @@ const app = createApp({
   ideaRepo,
   planRepo,
   analytics,
+  register,
+  login,
+  refreshTokens,
+  logout,
+  tokenService,
+  userRepo,
 });
 
 // --- Start server ---

@@ -82,7 +82,8 @@ neurotube-creator/
 │   │   │       ├── IPlanRepository.ts
 │   │   │       ├── IUserRepository.ts      # User CRUD (auth)
 │   │   │       ├── ISessionRepository.ts   # Session management (auth)
-│   │   │       └── IPasswordHasher.ts      # Password hashing abstraction (auth)
+│   │   │       ├── IPasswordHasher.ts      # Password hashing abstraction (auth)
+│   │   │       └── ITokenService.ts       # JWT token generation/verification (auth)
 │   │   │
 │   │   ├── application/             # 🟡 USE CASES (depends on domain only)
 │   │   │   ├── use-cases/
@@ -97,7 +98,11 @@ neurotube-creator/
 │   │   │   │   ├── GenerateShorts.ts
 │   │   │   │   ├── AnalyzeNiche.ts
 │   │   │   │   ├── GenerateMonetization.ts
-│   │   │   │   └── GenerateRoadmap.ts
+│   │   │   │   ├── GenerateRoadmap.ts
+│   │   │   │   ├── Register.ts          # User registration (auth)
+│   │   │   │   ├── Login.ts             # User login (auth)
+│   │   │   │   ├── RefreshTokens.ts     # Token rotation (auth)
+│   │   │   │   └── Logout.ts            # Session invalidation (auth)
 │   │   │   └── dto/                 # Input/output data transfer objects
 │   │   │       ├── GenerateIdeasInput.ts
 │   │   │       └── GenerateIdeasOutput.ts
@@ -112,6 +117,9 @@ neurotube-creator/
 │   │   │   │   ├── PlanRepository.ts     # Implements IPlanRepository
 │   │   │   │   ├── UserRepository.ts     # Implements IUserRepository (auth)
 │   │   │   │   └── SessionRepository.ts  # Implements ISessionRepository (auth)
+│   │   │   ├── auth/
+│   │   │   │   ├── BcryptHasher.ts      # Implements IPasswordHasher with bcryptjs
+│   │   │   │   └── JwtService.ts        # Implements ITokenService with jose
 │   │   │   └── config/
 │   │   │       └── env.ts                # Environment variable validation
 │   │   │
@@ -124,9 +132,11 @@ neurotube-creator/
 │   │       │   ├── descriptions.ts       # POST /api/descriptions/generate
 │   │       │   ├── branding.ts           # POST /api/branding/generate
 │   │       │   ├── analysis.ts           # POST /api/analysis/niche
+│   │       │   ├── auth.ts              # POST /api/auth/register,login,refresh,logout + GET /me
 │   │       │   └── health.ts             # GET  /api/health
 │   │       ├── middleware/
 │   │       │   ├── errorHandler.ts       # Global error handling
+│   │       │   ├── authMiddleware.ts     # JWT Bearer token verification (auth)
 │   │       │   ├── rateLimiter.ts        # Rate limiting
 │   │       │   └── cors.ts              # CORS config
 │   │       └── app.ts                    # Hono app composition root
@@ -438,6 +448,11 @@ export const plans = pgTable('plans', {
 | GET | `/api/plans` | — | List saved plans |
 | GET | `/api/plans/:id` | — | Get plan by ID |
 | DELETE | `/api/plans/:id` | — | Delete plan by ID |
+| POST | `/api/auth/register` | Register | User registration |
+| POST | `/api/auth/login` | Login | User login |
+| POST | `/api/auth/refresh` | RefreshTokens | Token rotation |
+| POST | `/api/auth/logout` | Logout | Session invalidation |
+| GET | `/api/auth/me` | — | Current user (requires auth) |
 
 ## Anti-Patterns
 

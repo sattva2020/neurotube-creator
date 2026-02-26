@@ -23,7 +23,13 @@ import type { GenerateRoadmap } from '../application/use-cases/GenerateRoadmap.j
 import type { GenerateSunoPrompt } from '../application/use-cases/GenerateSunoPrompt.js';
 import type { IIdeaRepository } from '../domain/ports/IIdeaRepository.js';
 import type { IPlanRepository } from '../domain/ports/IPlanRepository.js';
+import type { ITokenService } from '../domain/ports/ITokenService.js';
+import type { IUserRepository } from '../domain/ports/IUserRepository.js';
 import type { PostHogService } from '../infrastructure/analytics/index.js';
+import type { Register } from '../application/use-cases/Register.js';
+import type { Login } from '../application/use-cases/Login.js';
+import type { RefreshTokens } from '../application/use-cases/RefreshTokens.js';
+import type { Logout } from '../application/use-cases/Logout.js';
 import { ideasRoutes } from './routes/ideas.js';
 import { plansRoutes } from './routes/plans.js';
 import { thumbnailsRoutes } from './routes/thumbnails.js';
@@ -36,6 +42,7 @@ import { shortsRoutes } from './routes/shorts.js';
 import { monetizationRoutes } from './routes/monetization.js';
 import { roadmapRoutes } from './routes/roadmap.js';
 import { sunoRoutes } from './routes/suno.js';
+import { authRoutes } from './routes/auth.js';
 
 const logger = createLogger('App');
 
@@ -55,6 +62,12 @@ export interface AppDeps {
   ideaRepo: IIdeaRepository;
   planRepo: IPlanRepository;
   analytics: PostHogService;
+  register: Register;
+  login: Login;
+  refreshTokens: RefreshTokens;
+  logout: Logout;
+  tokenService: ITokenService;
+  userRepo: IUserRepository;
 }
 
 export function createApp(deps: AppDeps) {
@@ -81,6 +94,14 @@ export function createApp(deps: AppDeps) {
   app.route('/api/monetization', monetizationRoutes(deps.generateMonetization));
   app.route('/api/roadmap', roadmapRoutes(deps.generateRoadmap));
   app.route('/api/suno', sunoRoutes(deps.generateSunoPrompt));
+  app.route('/api/auth', authRoutes({
+    register: deps.register,
+    login: deps.login,
+    refreshTokens: deps.refreshTokens,
+    logout: deps.logout,
+    tokenService: deps.tokenService,
+    userRepo: deps.userRepo,
+  }));
 
   // --- Static file serving (SPA) ---
   const staticDir = process.env.STATIC_DIR || path.join(__dirname, '../../client/dist');
@@ -112,6 +133,7 @@ export function createApp(deps: AppDeps) {
       '/api/health', '/api/ideas', '/api/plans', '/api/thumbnails',
       '/api/titles', '/api/descriptions', '/api/branding', '/api/analysis',
       '/api/notebooklm', '/api/shorts', '/api/monetization', '/api/roadmap', '/api/suno',
+      '/api/auth',
     ],
     staticDir: fs.existsSync(staticDirResolved) ? staticDirResolved : 'NOT FOUND',
   });

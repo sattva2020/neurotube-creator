@@ -18,7 +18,7 @@ AI-powered YouTube idea generator and script outliner for psychology/neuroscienc
 - **Monetization Copy:** Patreon/Boosty promotional text generation
 - **30-Day Content Roadmap:** Strategic content plan with long-form and Shorts ideas
 - **Data Persistence:** Save and browse generated ideas and plans (PostgreSQL)
-- **Authentication:** User registration and login with JWT access/refresh tokens, bcrypt password hashing
+- **Authentication:** User registration/login with JWT access tokens (15m, HS256 via jose) + refresh token rotation (7d, opaque UUID), bcrypt password hashing, auth middleware, session management
 - **Role-Based Access:** 4-tier hierarchy (Owner → Admin → Editor → Viewer) with permission checking
 
 ## Tech Stack
@@ -38,6 +38,7 @@ AI-powered YouTube idea generator and script outliner for psychology/neuroscienc
 - **Validation:** Zod
 - **AI Provider:** Google Gemini API (`@google/genai`) — gemini-3-flash-preview (text), gemini-3-pro-image-preview (images)
 - **Analytics:** PostHog (`posthog-node`) — opt-in server-side event tracking and API metrics
+- **Auth:** `jose` (JWT HS256 access tokens), `bcryptjs` (password hashing)
 
 ### Database
 - **Database:** PostgreSQL
