@@ -2,6 +2,7 @@ import { pgTable, uuid, text, timestamp, jsonb, boolean } from 'drizzle-orm/pg-c
 
 export const ideas = pgTable('ideas', {
   id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
   title: text('title').notNull(),
   hook: text('hook').notNull(),
   targetAudience: text('target_audience').notNull(),
@@ -37,6 +38,7 @@ export const sessions = pgTable('sessions', {
 
 export const plans = pgTable('plans', {
   id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
   ideaId: uuid('idea_id').references(() => ideas.id),
   title: text('title').notNull(),
   markdown: text('markdown').notNull(),

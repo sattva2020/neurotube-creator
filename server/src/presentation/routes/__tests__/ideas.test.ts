@@ -4,6 +4,9 @@ import { ideasRoutes } from '../ideas.js';
 import type { GenerateIdeas } from '../../../application/use-cases/GenerateIdeas.js';
 import type { IIdeaRepository } from '../../../domain/ports/IIdeaRepository.js';
 import type { VideoIdea } from '../../../domain/entities/VideoIdea.js';
+import type { AuthVariables } from '../../middleware/authMiddleware.js';
+
+const userId = 'user-uuid-1';
 
 const mockIdeas: VideoIdea[] = [
   {
@@ -19,7 +22,7 @@ const mockIdeas: VideoIdea[] = [
 ];
 
 describe('Ideas Routes', () => {
-  let app: Hono;
+  let app: Hono<{ Variables: AuthVariables }>;
   let mockGenerateIdeas: { execute: ReturnType<typeof vi.fn> };
   let mockIdeaRepo: {
     saveMany: ReturnType<typeof vi.fn>;
@@ -37,7 +40,12 @@ describe('Ideas Routes', () => {
       delete: vi.fn().mockResolvedValue(undefined),
     };
 
-    app = new Hono();
+    app = new Hono<{ Variables: AuthVariables }>();
+    // Inject mock auth user
+    app.use('*', async (c, next) => {
+      c.set('user', { userId, role: 'owner', email: 'test@test.com' });
+      await next();
+    });
     app.route('/api/ideas', ideasRoutes(
       mockGenerateIdeas as unknown as GenerateIdeas,
       mockIdeaRepo as unknown as IIdeaRepository,
@@ -45,7 +53,7 @@ describe('Ideas Routes', () => {
   });
 
   describe('POST /api/ideas/generate', () => {
-    it('should generate ideas with valid input', async () => {
+    it('should generate ideas with valid input and userId', async () => {
       const res = await app.request('/api/ideas/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -55,7 +63,7 @@ describe('Ideas Routes', () => {
       expect(res.status).toBe(200);
       const body = await res.json() as { data: VideoIdea[] };
       expect(body.data).toEqual(mockIdeas);
-      expect(mockGenerateIdeas.execute).toHaveBeenCalledWith('brain hacks', 'psychology');
+      expect(mockGenerateIdeas.execute).toHaveBeenCalledWith('brain hacks', 'psychology', userId);
     });
 
     it('should return 400 for missing topic', async () => {
@@ -90,13 +98,13 @@ describe('Ideas Routes', () => {
   });
 
   describe('GET /api/ideas/:id', () => {
-    it('should return idea by id', async () => {
+    it('should return idea by id scoped to user', async () => {
       const res = await app.request('/api/ideas/550e8400-e29b-41d4-a716-446655440000');
 
       expect(res.status).toBe(200);
       const body = await res.json() as { data: VideoIdea };
       expect(body.data).toEqual(mockIdeas[0]);
-      expect(mockIdeaRepo.findById).toHaveBeenCalledWith('550e8400-e29b-41d4-a716-446655440000');
+      expect(mockIdeaRepo.findById).toHaveBeenCalledWith('550e8400-e29b-41d4-a716-446655440000', userId);
     });
 
     it('should return 404 when idea not found', async () => {
@@ -115,7 +123,7 @@ describe('Ideas Routes', () => {
   });
 
   describe('DELETE /api/ideas/:id', () => {
-    it('should delete idea by id', async () => {
+    it('should delete idea by id scoped to user', async () => {
       const res = await app.request('/api/ideas/550e8400-e29b-41d4-a716-446655440000', {
         method: 'DELETE',
       });
@@ -123,7 +131,7 @@ describe('Ideas Routes', () => {
       expect(res.status).toBe(200);
       const body = await res.json() as { success: boolean };
       expect(body.success).toBe(true);
-      expect(mockIdeaRepo.delete).toHaveBeenCalledWith('550e8400-e29b-41d4-a716-446655440000');
+      expect(mockIdeaRepo.delete).toHaveBeenCalledWith('550e8400-e29b-41d4-a716-446655440000', userId);
     });
 
     it('should return 400 for invalid uuid', async () => {
@@ -136,20 +144,20 @@ describe('Ideas Routes', () => {
   });
 
   describe('GET /api/ideas', () => {
-    it('should list all ideas without filter', async () => {
+    it('should list all ideas for current user', async () => {
       const res = await app.request('/api/ideas');
 
       expect(res.status).toBe(200);
       const body = await res.json() as { data: VideoIdea[] };
       expect(body.data).toEqual(mockIdeas);
-      expect(mockIdeaRepo.findAll).toHaveBeenCalledWith(undefined);
+      expect(mockIdeaRepo.findAll).toHaveBeenCalledWith(userId, undefined);
     });
 
-    it('should filter ideas by niche', async () => {
+    it('should filter ideas by niche for current user', async () => {
       const res = await app.request('/api/ideas?niche=ambient');
 
       expect(res.status).toBe(200);
-      expect(mockIdeaRepo.findAll).toHaveBeenCalledWith('ambient');
+      expect(mockIdeaRepo.findAll).toHaveBeenCalledWith(userId, 'ambient');
     });
   });
 });

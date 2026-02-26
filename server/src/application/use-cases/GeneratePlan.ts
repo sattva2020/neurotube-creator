@@ -12,9 +12,9 @@ export class GeneratePlan {
     private planRepo: IPlanRepository,
   ) {}
 
-  async execute(title: string, hook: string, niche: Niche): Promise<VideoPlan> {
+  async execute(title: string, hook: string, niche: Niche, userId: string): Promise<VideoPlan> {
     const start = Date.now();
-    logger.debug('execute() called', { title, hook, niche });
+    logger.debug('execute() called', { title, hook, niche, userId });
 
     try {
       const markdown = await this.aiService.generatePlan(title, hook, niche);
@@ -27,7 +27,7 @@ export class GeneratePlan {
         createdAt: new Date(),
       };
 
-      const saved = await this.planRepo.save(plan);
+      const saved = await this.planRepo.save(plan, userId);
       logger.debug('Plan persisted', { id: saved.id });
 
       const elapsed = Date.now() - start;

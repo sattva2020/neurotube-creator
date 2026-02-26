@@ -12,15 +12,15 @@ export class GenerateIdeas {
     private ideaRepo: IIdeaRepository,
   ) {}
 
-  async execute(topic: string, niche: Niche): Promise<VideoIdea[]> {
+  async execute(topic: string, niche: Niche, userId: string): Promise<VideoIdea[]> {
     const start = Date.now();
-    logger.debug('execute() called', { topic, niche });
+    logger.debug('execute() called', { topic, niche, userId });
 
     try {
       const ideas = await this.aiService.generateIdeas(topic, niche);
       logger.debug('AI returned ideas', { count: ideas.length });
 
-      const saved = await this.ideaRepo.saveMany(ideas, topic);
+      const saved = await this.ideaRepo.saveMany(ideas, topic, userId);
       logger.debug('Ideas persisted', { count: saved.length });
 
       const elapsed = Date.now() - start;

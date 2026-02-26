@@ -1,4 +1,4 @@
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, and } from 'drizzle-orm';
 import type { IIdeaRepository } from '../../domain/ports/IIdeaRepository.js';
 import type { VideoIdea } from '../../domain/entities/VideoIdea.js';
 import type { Niche } from '../../domain/entities/Niche.js';
@@ -11,11 +11,12 @@ const logger = createLogger('IdeaRepository');
 export class IdeaRepository implements IIdeaRepository {
   constructor(private db: DbClient) {}
 
-  async saveMany(ideaList: VideoIdea[], topic: string): Promise<VideoIdea[]> {
+  async saveMany(ideaList: VideoIdea[], topic: string, userId: string): Promise<VideoIdea[]> {
     const start = Date.now();
-    logger.debug('saveMany() called', { count: ideaList.length, topic });
+    logger.debug('saveMany() called', { count: ideaList.length, topic, userId });
 
     const rows = ideaList.map((idea) => ({
+      userId,
       title: idea.title,
       hook: idea.hook,
       targetAudience: idea.targetAudience,
@@ -31,38 +32,47 @@ export class IdeaRepository implements IIdeaRepository {
 
     const result = inserted.map(this.toEntity);
     const elapsed = Date.now() - start;
-    logger.info('saveMany() completed', { count: result.length, topic, elapsed });
+    logger.info('saveMany() completed', { count: result.length, topic, userId, elapsed });
     return result;
   }
 
-  async findAll(niche?: Niche): Promise<VideoIdea[]> {
+  async findAll(userId: string, niche?: Niche): Promise<VideoIdea[]> {
     const start = Date.now();
-    logger.debug('findAll() called', { niche: niche ?? 'all' });
+    logger.debug('findAll() called', { userId, niche: niche ?? 'all' });
 
-    const query = this.db.select().from(ideas).orderBy(desc(ideas.createdAt));
-    const rows = niche
-      ? await query.where(eq(ideas.niche, niche))
-      : await query;
+    const conditions = niche
+      ? and(eq(ideas.userId, userId), eq(ideas.niche, niche))
+      : eq(ideas.userId, userId);
+
+    const rows = await this.db
+      .select()
+      .from(ideas)
+      .where(conditions)
+      .orderBy(desc(ideas.createdAt));
 
     const result = rows.map(this.toEntity);
     const elapsed = Date.now() - start;
-    logger.info('findAll() completed', { count: result.length, niche: niche ?? 'all', elapsed });
+    logger.info('findAll() completed', { count: result.length, userId, niche: niche ?? 'all', elapsed });
     return result;
   }
 
-  async findById(id: string): Promise<VideoIdea | null> {
+  async findById(id: string, userId?: string): Promise<VideoIdea | null> {
     const start = Date.now();
-    logger.debug('findById() called', { id });
+    logger.debug('findById() called', { id, userId });
+
+    const conditions = userId
+      ? and(eq(ideas.id, id), eq(ideas.userId, userId))
+      : eq(ideas.id, id);
 
     const [row] = await this.db
       .select()
       .from(ideas)
-      .where(eq(ideas.id, id))
+      .where(conditions)
       .limit(1);
 
     const elapsed = Date.now() - start;
     if (!row) {
-      logger.info('findById() not found', { id, elapsed });
+      logger.info('findById() not found', { id, userId, elapsed });
       return null;
     }
 
@@ -70,19 +80,24 @@ export class IdeaRepository implements IIdeaRepository {
     return this.toEntity(row);
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: string, userId?: string): Promise<void> {
     const start = Date.now();
-    logger.debug('delete() called', { id });
+    logger.debug('delete() called', { id, userId });
 
-    await this.db.delete(ideas).where(eq(ideas.id, id));
+    const conditions = userId
+      ? and(eq(ideas.id, id), eq(ideas.userId, userId))
+      : eq(ideas.id, id);
+
+    await this.db.delete(ideas).where(conditions);
 
     const elapsed = Date.now() - start;
-    logger.info('delete() completed', { id, elapsed });
+    logger.info('delete() completed', { id, userId, elapsed });
   }
 
   private toEntity(row: typeof ideas.$inferSelect): VideoIdea {
     return {
       id: row.id,
+      userId: row.userId,
       title: row.title,
       hook: row.hook,
       targetAudience: row.targetAudience,

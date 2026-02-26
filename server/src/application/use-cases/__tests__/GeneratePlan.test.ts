@@ -45,14 +45,16 @@ describe('GeneratePlan', () => {
     useCase = new GeneratePlan(aiService, planRepo);
   });
 
+  const userId = 'user-uuid-1';
+
   it('should call aiService.generatePlan with correct args', async () => {
-    await useCase.execute('Brain Hacks 101', 'Did you know...', 'psychology');
+    await useCase.execute('Brain Hacks 101', 'Did you know...', 'psychology', userId);
 
     expect(aiService.generatePlan).toHaveBeenCalledWith('Brain Hacks 101', 'Did you know...', 'psychology');
   });
 
-  it('should create VideoPlan and call planRepo.save', async () => {
-    await useCase.execute('Brain Hacks 101', 'Did you know...', 'psychology');
+  it('should create VideoPlan and call planRepo.save with userId', async () => {
+    await useCase.execute('Brain Hacks 101', 'Did you know...', 'psychology', userId);
 
     expect(planRepo.save).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -61,11 +63,12 @@ describe('GeneratePlan', () => {
         niche: 'psychology',
         createdAt: expect.any(Date),
       }),
+      userId,
     );
   });
 
   it('should return saved plan', async () => {
-    const result = await useCase.execute('Brain Hacks 101', 'Did you know...', 'psychology');
+    const result = await useCase.execute('Brain Hacks 101', 'Did you know...', 'psychology', userId);
 
     expect(result).toEqual(savedPlan);
     expect(result.id).toBe('plan-123');
@@ -74,12 +77,12 @@ describe('GeneratePlan', () => {
   it('should propagate errors from aiService', async () => {
     (aiService.generatePlan as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('AI failed'));
 
-    await expect(useCase.execute('test', 'hook', 'psychology')).rejects.toThrow('AI failed');
+    await expect(useCase.execute('test', 'hook', 'psychology', userId)).rejects.toThrow('AI failed');
   });
 
   it('should propagate errors from planRepo', async () => {
     (planRepo.save as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('DB failed'));
 
-    await expect(useCase.execute('test', 'hook', 'ambient')).rejects.toThrow('DB failed');
+    await expect(useCase.execute('test', 'hook', 'ambient', userId)).rejects.toThrow('DB failed');
   });
 });

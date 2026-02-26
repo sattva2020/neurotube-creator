@@ -17,7 +17,7 @@ AI-powered YouTube idea generator and script outliner for psychology/neuroscienc
 - **Suno.ai Prompt Generator:** Optimized music prompts for ambient track creation
 - **Monetization Copy:** Patreon/Boosty promotional text generation
 - **30-Day Content Roadmap:** Strategic content plan with long-form and Shorts ideas
-- **Data Persistence:** Save and browse generated ideas and plans (PostgreSQL)
+- **Data Persistence:** Save and browse generated ideas and plans (PostgreSQL), user-scoped data isolation
 - **Authentication:** User registration/login with JWT access tokens (15m, HS256 via jose) + refresh token rotation (7d, opaque UUID), bcrypt password hashing, auth middleware, session management
 - **Role-Based Access:** 4-tier hierarchy (Owner → Admin → Editor → Viewer) with `requireRole` middleware, global auth guard on /api/*, admin user management (list/update role/deactivate), first-user-as-owner auto-assignment
 - **Auth Frontend:** Login/Register pages, auth store with JWT token management, route guards (requiresAuth, requiresRole, guest), 401 auto-refresh, admin user management page, user info in toolbar
@@ -77,6 +77,6 @@ Pattern: Clean Architecture (backend) + Quasar conventions (frontend)
 - **Security:** API key server-side only, rate limiting, CORS
 - **Responsiveness:** Quasar responsive grid and breakpoint utilities
 - **Accessibility:** Quasar ARIA-compliant components
-- **Persistence:** PostgreSQL for saving generated ideas, plans, history
+- **Persistence:** PostgreSQL for saving generated ideas, plans, history — user-scoped (userId FK on ideas/plans, CASCADE delete)
 - **Authentication:** JWT access + refresh tokens, bcrypt password hashing, session management
 - **Authorization:** Global auth guard on /api/*, `requireRole(minRole)` middleware, 4-tier ROLE_HIERARCHY, admin API for user management, first-user-as-owner seeding

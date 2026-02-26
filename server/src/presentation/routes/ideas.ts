@@ -3,31 +3,34 @@ import { zValidator } from '@hono/zod-validator';
 import type { GenerateIdeas } from '../../application/use-cases/GenerateIdeas.js';
 import type { IIdeaRepository } from '../../domain/ports/IIdeaRepository.js';
 import type { Niche } from '../../domain/entities/Niche.js';
+import type { AuthVariables } from '../middleware/authMiddleware.js';
 import { generateIdeasSchema, listIdeasQuerySchema, uuidParamSchema } from '../schemas.js';
 import { createLogger } from '../../infrastructure/logger.js';
 
 const logger = createLogger('IdeasRoute');
 
 export function ideasRoutes(generateIdeas: GenerateIdeas, ideaRepo: IIdeaRepository) {
-  const app = new Hono();
+  const app = new Hono<{ Variables: AuthVariables }>();
 
   app.post('/generate', zValidator('json', generateIdeasSchema), async (c) => {
     const { topic, niche } = c.req.valid('json');
-    logger.debug('POST /api/ideas/generate', { topic, niche });
+    const { userId } = c.get('user');
+    logger.debug('POST /api/ideas/generate', { topic, niche, userId });
 
-    const ideas = await generateIdeas.execute(topic, niche);
-    logger.info('Ideas generated', { count: ideas.length, topic, niche });
+    const ideas = await generateIdeas.execute(topic, niche, userId);
+    logger.info('Ideas generated', { count: ideas.length, topic, niche, userId });
 
     return c.json({ data: ideas });
   });
 
   app.get('/:id', zValidator('param', uuidParamSchema), async (c) => {
     const { id } = c.req.valid('param');
-    logger.debug('GET /api/ideas/:id', { id });
+    const { userId } = c.get('user');
+    logger.debug('GET /api/ideas/:id', { id, userId });
 
-    const idea = await ideaRepo.findById(id);
+    const idea = await ideaRepo.findById(id, userId);
     if (!idea) {
-      logger.info('Idea not found', { id });
+      logger.info('Idea not found', { id, userId });
       return c.json({ error: 'Idea not found' }, 404);
     }
 
@@ -37,20 +40,22 @@ export function ideasRoutes(generateIdeas: GenerateIdeas, ideaRepo: IIdeaReposit
 
   app.delete('/:id', zValidator('param', uuidParamSchema), async (c) => {
     const { id } = c.req.valid('param');
-    logger.debug('DELETE /api/ideas/:id', { id });
+    const { userId } = c.get('user');
+    logger.debug('DELETE /api/ideas/:id', { id, userId });
 
-    await ideaRepo.delete(id);
-    logger.info('Idea deleted', { id });
+    await ideaRepo.delete(id, userId);
+    logger.info('Idea deleted', { id, userId });
 
     return c.json({ success: true });
   });
 
   app.get('/', zValidator('query', listIdeasQuerySchema), async (c) => {
     const { niche } = c.req.valid('query');
-    logger.debug('GET /api/ideas', { niche: niche ?? 'all' });
+    const { userId } = c.get('user');
+    logger.debug('GET /api/ideas', { userId, niche: niche ?? 'all' });
 
-    const ideas = await ideaRepo.findAll(niche as Niche | undefined);
-    logger.info('Ideas listed', { count: ideas.length, niche: niche ?? 'all' });
+    const ideas = await ideaRepo.findAll(userId, niche as Niche | undefined);
+    logger.info('Ideas listed', { count: ideas.length, userId, niche: niche ?? 'all' });
 
     return c.json({ data: ideas });
   });

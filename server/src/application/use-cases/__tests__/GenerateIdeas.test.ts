@@ -49,20 +49,22 @@ describe('GenerateIdeas', () => {
     useCase = new GenerateIdeas(aiService, ideaRepo);
   });
 
+  const userId = 'user-uuid-1';
+
   it('should call aiService.generateIdeas with correct args', async () => {
-    await useCase.execute('brain hacks', 'psychology');
+    await useCase.execute('brain hacks', 'psychology', userId);
 
     expect(aiService.generateIdeas).toHaveBeenCalledWith('brain hacks', 'psychology');
   });
 
-  it('should call ideaRepo.saveMany with ideas and topic', async () => {
-    await useCase.execute('brain hacks', 'psychology');
+  it('should call ideaRepo.saveMany with ideas, topic and userId', async () => {
+    await useCase.execute('brain hacks', 'psychology', userId);
 
-    expect(ideaRepo.saveMany).toHaveBeenCalledWith(mockIdeas, 'brain hacks');
+    expect(ideaRepo.saveMany).toHaveBeenCalledWith(mockIdeas, 'brain hacks', userId);
   });
 
   it('should return saved ideas', async () => {
-    const result = await useCase.execute('brain hacks', 'psychology');
+    const result = await useCase.execute('brain hacks', 'psychology', userId);
 
     expect(result).toEqual(mockIdeas);
   });
@@ -70,12 +72,12 @@ describe('GenerateIdeas', () => {
   it('should propagate errors from aiService', async () => {
     (aiService.generateIdeas as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('AI failed'));
 
-    await expect(useCase.execute('test', 'psychology')).rejects.toThrow('AI failed');
+    await expect(useCase.execute('test', 'psychology', userId)).rejects.toThrow('AI failed');
   });
 
   it('should propagate errors from ideaRepo', async () => {
     (ideaRepo.saveMany as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('DB failed'));
 
-    await expect(useCase.execute('test', 'psychology')).rejects.toThrow('DB failed');
+    await expect(useCase.execute('test', 'psychology', userId)).rejects.toThrow('DB failed');
   });
 });

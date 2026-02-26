@@ -2,8 +2,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { IdeaRepository } from '../IdeaRepository.js';
 import type { VideoIdea } from '../../../domain/entities/VideoIdea.js';
 
+const userId = 'user-uuid-1';
+const otherUserId = 'user-uuid-2';
+
 const mockDbRow = {
   id: 'uuid-1',
+  userId,
   title: 'Brain Hacks 101',
   hook: 'Did you know your brain rewires itself?',
   targetAudience: 'Students',
@@ -22,10 +26,9 @@ function createMockDb() {
   const insertFn = vi.fn().mockReturnValue({ values });
 
   const limit = vi.fn();
-  const findByIdWhere = vi.fn().mockReturnValue({ limit });
-  const where = vi.fn();
-  const orderBy = vi.fn().mockReturnValue({ where });
-  const from = vi.fn().mockReturnValue({ orderBy, where: findByIdWhere });
+  const orderBy = vi.fn();
+  const where = vi.fn().mockReturnValue({ orderBy, limit });
+  const from = vi.fn().mockReturnValue({ where });
   const select = vi.fn().mockReturnValue({ from });
 
   const deleteWhere = vi.fn().mockResolvedValue(undefined);
@@ -35,7 +38,7 @@ function createMockDb() {
     insert: insertFn,
     select,
     delete: deleteFn,
-    _chain: { values, returning, from, orderBy, where, findByIdWhere, limit, deleteWhere },
+    _chain: { values, returning, from, where, orderBy, limit, deleteWhere },
   };
 }
 
@@ -49,7 +52,7 @@ describe('IdeaRepository', () => {
   });
 
   describe('saveMany', () => {
-    it('should insert ideas and return mapped entities', async () => {
+    it('should insert ideas with userId and return mapped entities', async () => {
       db._chain.returning.mockResolvedValue([mockDbRow]);
 
       const ideas: VideoIdea[] = [
@@ -65,11 +68,12 @@ describe('IdeaRepository', () => {
         },
       ];
 
-      const result = await repo.saveMany(ideas, 'brain hacks');
+      const result = await repo.saveMany(ideas, 'brain hacks', userId);
 
       expect(db.insert).toHaveBeenCalled();
       expect(db._chain.values).toHaveBeenCalledWith([
         expect.objectContaining({
+          userId,
           title: 'Brain Hacks 101',
           topic: 'brain hacks',
           niche: 'psychology',
@@ -78,6 +82,7 @@ describe('IdeaRepository', () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
         id: 'uuid-1',
+        userId,
         title: 'Brain Hacks 101',
         hook: 'Did you know your brain rewires itself?',
         targetAudience: 'Students',
@@ -93,26 +98,27 @@ describe('IdeaRepository', () => {
     it('should propagate database errors', async () => {
       db._chain.returning.mockRejectedValue(new Error('DB insert failed'));
 
-      await expect(repo.saveMany([], 'test')).rejects.toThrow('DB insert failed');
+      await expect(repo.saveMany([], 'test', userId)).rejects.toThrow('DB insert failed');
     });
   });
 
   describe('findAll', () => {
-    it('should return all ideas when no niche filter', async () => {
+    it('should filter by userId', async () => {
       db._chain.orderBy.mockResolvedValue([mockDbRow]);
 
-      const result = await repo.findAll();
+      const result = await repo.findAll(userId);
 
       expect(db.select).toHaveBeenCalled();
+      expect(db._chain.where).toHaveBeenCalled();
       expect(result).toHaveLength(1);
       expect(result[0].id).toBe('uuid-1');
-      expect(result[0].title).toBe('Brain Hacks 101');
+      expect(result[0].userId).toBe(userId);
     });
 
-    it('should filter by niche when provided', async () => {
-      db._chain.where.mockResolvedValue([mockDbRow]);
+    it('should filter by userId and niche when provided', async () => {
+      db._chain.orderBy.mockResolvedValue([mockDbRow]);
 
-      const result = await repo.findAll('psychology');
+      const result = await repo.findAll(userId, 'psychology');
 
       expect(db._chain.where).toHaveBeenCalled();
       expect(result).toHaveLength(1);
@@ -122,21 +128,22 @@ describe('IdeaRepository', () => {
     it('should propagate database errors', async () => {
       db._chain.orderBy.mockRejectedValue(new Error('DB query failed'));
 
-      await expect(repo.findAll()).rejects.toThrow('DB query failed');
+      await expect(repo.findAll(userId)).rejects.toThrow('DB query failed');
     });
   });
 
   describe('findById', () => {
-    it('should return entity when found', async () => {
+    it('should return entity when found with userId scope', async () => {
       db._chain.limit.mockResolvedValue([mockDbRow]);
 
-      const result = await repo.findById('uuid-1');
+      const result = await repo.findById('uuid-1', userId);
 
       expect(db.select).toHaveBeenCalled();
-      expect(db._chain.findByIdWhere).toHaveBeenCalled();
+      expect(db._chain.where).toHaveBeenCalled();
       expect(db._chain.limit).toHaveBeenCalledWith(1);
       expect(result).toEqual({
         id: 'uuid-1',
+        userId,
         title: 'Brain Hacks 101',
         hook: 'Did you know your brain rewires itself?',
         targetAudience: 'Students',
@@ -152,7 +159,7 @@ describe('IdeaRepository', () => {
     it('should return null when not found', async () => {
       db._chain.limit.mockResolvedValue([]);
 
-      const result = await repo.findById('nonexistent');
+      const result = await repo.findById('nonexistent', userId);
 
       expect(result).toBeNull();
     });
@@ -160,13 +167,13 @@ describe('IdeaRepository', () => {
     it('should propagate database errors', async () => {
       db._chain.limit.mockRejectedValue(new Error('DB query failed'));
 
-      await expect(repo.findById('uuid-1')).rejects.toThrow('DB query failed');
+      await expect(repo.findById('uuid-1', userId)).rejects.toThrow('DB query failed');
     });
   });
 
   describe('delete', () => {
-    it('should call delete with correct id', async () => {
-      await repo.delete('uuid-1');
+    it('should call delete with userId scope', async () => {
+      await repo.delete('uuid-1', userId);
 
       expect(db.delete).toHaveBeenCalled();
       expect(db._chain.deleteWhere).toHaveBeenCalled();
@@ -175,7 +182,7 @@ describe('IdeaRepository', () => {
     it('should propagate database errors', async () => {
       db._chain.deleteWhere.mockRejectedValue(new Error('DB delete failed'));
 
-      await expect(repo.delete('uuid-1')).rejects.toThrow('DB delete failed');
+      await expect(repo.delete('uuid-1', userId)).rejects.toThrow('DB delete failed');
     });
   });
 });
