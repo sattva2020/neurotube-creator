@@ -26,8 +26,9 @@ RUN npm run build:client
 COPY server/drizzle/ ./server/drizzle/
 COPY server/drizzle.config.ts ./server/
 
-# Copy entrypoint for DB migrations
+# Copy entrypoint and scripts
 COPY docker-entrypoint.sh ./
+COPY scripts/ ./scripts/
 RUN chmod +x docker-entrypoint.sh
 
 ENV NODE_ENV=production
