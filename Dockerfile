@@ -26,13 +26,8 @@ RUN npm run build:client
 COPY server/drizzle/ ./server/drizzle/
 COPY server/drizzle.config.ts ./server/
 
-# Copy entrypoint and scripts
-COPY docker-entrypoint.sh ./
-COPY scripts/ ./scripts/
-RUN chmod +x docker-entrypoint.sh
-
 ENV NODE_ENV=production
 ENV PORT=3000
 EXPOSE 3000
 
-ENTRYPOINT ["./docker-entrypoint.sh"]
+CMD ["node", "server/dist/index.js"]
