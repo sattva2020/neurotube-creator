@@ -21,7 +21,7 @@
 - [x] **E2E Testing (Playwright)** — настройка Playwright, тесты ключевых флоу: генерация идей, просмотр плана, AI-инструменты, persistence
 - [x] **Usage Analytics & Monitoring** — интеграция аналитики (Plausible/PostHog), трекинг действий пользователя, API-метрики, дашборд мониторинга
 - [x] **Auth Domain & Database Schema** — User/Role/Session entities, ports (IUserRepository, IAuthService), Drizzle-схема (users, roles, sessions), миграции
-- [ ] **Auth Backend (Hono)** — JWT-сервис, bcrypt хеширование, auth middleware, маршруты login/register/logout/refresh, Zod-валидация
+- [x] **Auth Backend (Hono)** — JWT-сервис, bcrypt хеширование, auth middleware, маршруты login/register/logout/refresh, Zod-валидация
 - [ ] **Role-Based Access Control (RBAC)** — 4-ролевая модель (Owner → Admin → Editor → Viewer), permission-система, ролевые middleware, защита API-маршрутов
 - [ ] **Auth Frontend (Vue 3 + Quasar)** — Login/Register страницы, Pinia auth store, route guards, token management, useAuth composable
 - [ ] **User-Scoped Data** — userId в таблицах ideas/plans, миграция, фильтрация данных по пользователю, обновление репозиториев
@@ -49,3 +49,4 @@
 | E2E Testing (Playwright) | 2026-02-26 |
 | Usage Analytics & Monitoring | 2026-02-26 |
 | Auth Domain & Database Schema | 2026-02-26 |
+| Auth Backend (Hono) | 2026-02-26 |
