@@ -1,7 +1,7 @@
-FROM node:22-slim AS builder
+FROM node:22-slim
 WORKDIR /app
 
-# Install all dependencies
+# Install all dependencies (dev needed for build step)
 COPY package.json package-lock.json ./
 COPY client/package.json ./client/
 COPY server/package.json ./server/
@@ -22,30 +22,16 @@ RUN npm run build:server
 COPY client/ ./client/
 RUN npm run build:client
 
-# ---- Production ----
-FROM node:22-slim AS production
-WORKDIR /app
-
-ENV NODE_ENV=production
-ENV PORT=3000
-
-# Install production dependencies + drizzle-kit for migrations
-COPY package.json package-lock.json ./
-COPY client/package.json ./client/
-COPY server/package.json ./server/
-COPY shared/package.json ./shared/
-RUN npm ci --omit=dev && npm install -w @neurotube/server drizzle-kit
-
-# Copy built artifacts
-COPY --from=builder /app/server/dist/ ./server/dist/
-COPY --from=builder /app/client/dist/ ./client/dist/
-COPY --from=builder /app/shared/dist/ ./shared/dist/
-
 # Copy Drizzle migrations and config
 COPY server/drizzle/ ./server/drizzle/
 COPY server/drizzle.config.ts ./server/
 
+# Copy entrypoint
+COPY docker-entrypoint.sh ./
+RUN chmod +x docker-entrypoint.sh
+
+ENV NODE_ENV=production
+ENV PORT=3000
 EXPOSE 3000
 
-# Temporarily skip entrypoint to test if build + prod stage work
-CMD ["node", "server/dist/index.js"]
+ENTRYPOINT ["./docker-entrypoint.sh"]
