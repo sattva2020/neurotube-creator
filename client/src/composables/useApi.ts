@@ -88,11 +88,69 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
   return data.data;
 }
 
+async function download(path: string): Promise<void> {
+  const url = `${BASE_URL}${path}`;
+  console.debug(`[useApi] DOWNLOAD ${url}`);
+
+  const authStore = useAuthStore();
+
+  const headers: Record<string, string> = {};
+  if (authStore.accessToken) {
+    headers['Authorization'] = `Bearer ${authStore.accessToken}`;
+  }
+
+  let response = await fetch(url, { method: 'GET', headers });
+  console.debug(`[useApi] DOWNLOAD ${url} → ${response.status}`);
+
+  // 401 auto-refresh
+  if (response.status === 401 && !isAuthEndpoint(path) && authStore.refreshToken) {
+    console.debug('[useApi] 401 on download, attempting token refresh');
+    if (!isRefreshing) {
+      isRefreshing = true;
+      refreshPromise = authStore.refresh();
+    }
+    const refreshed = await refreshPromise;
+    isRefreshing = false;
+    refreshPromise = null;
+
+    if (refreshed && authStore.accessToken) {
+      headers['Authorization'] = `Bearer ${authStore.accessToken}`;
+      response = await fetch(url, { method: 'GET', headers });
+      console.debug(`[useApi] Download retry → ${response.status}`);
+    }
+  }
+
+  if (!response.ok) {
+    const message = response.statusText || 'Download failed';
+    console.debug('[useApi] Download error:', message);
+    throw new ApiRequestError(response.status, 'DOWNLOAD_FAILED', message);
+  }
+
+  // Extract filename from Content-Disposition header
+  const disposition = response.headers.get('Content-Disposition') ?? '';
+  const filenameMatch = disposition.match(/filename="?([^";\n]+)"?/);
+  const filename = filenameMatch?.[1] ?? 'download';
+
+  const blob = await response.blob();
+  console.debug(`[useApi] Download complete: ${filename} (${blob.size} bytes)`);
+
+  // Trigger browser download
+  const objectUrl = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = objectUrl;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(objectUrl);
+}
+
 export function useApi() {
   return {
     get: <T>(path: string) => request<T>('GET', path),
     post: <T>(path: string, body: unknown) => request<T>('POST', path, body),
     patch: <T>(path: string, body: unknown) => request<T>('PATCH', path, body),
     del: <T>(path: string) => request<T>('DELETE', path),
+    download,
   };
 }

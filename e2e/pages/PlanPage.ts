@@ -22,6 +22,12 @@ export class PlanPage {
   readonly markdownContent: Locator;
   readonly copyButton: Locator;
 
+  // Export
+  readonly exportDropdown: Locator;
+  readonly exportPdfItem: Locator;
+  readonly exportDocxItem: Locator;
+  readonly exportError: Locator;
+
   // Tools navigation
   readonly toolsButton: Locator;
 
@@ -45,6 +51,12 @@ export class PlanPage {
     this.planTitle = page.locator('.text-h5').first();
     this.markdownContent = page.locator('[class*="plan-content"], .markdown-body, [v-html]').first();
     this.copyButton = page.locator('.q-btn').filter({ has: page.locator('.material-icons:has-text("content_copy")') });
+
+    // Export dropdown
+    this.exportDropdown = page.locator('.q-btn-dropdown').filter({ has: page.locator('.material-icons:has-text("download")') });
+    this.exportPdfItem = page.locator('.q-item').filter({ hasText: /PDF/i });
+    this.exportDocxItem = page.locator('.q-item').filter({ hasText: /DOCX/i });
+    this.exportError = page.locator('.q-banner.bg-warning');
 
     // AI tools button
     this.toolsButton = page.locator('.q-btn.bg-primary, .q-btn[class*="primary"]').filter({ hasText: /инструмент|tool/i });
@@ -103,6 +115,25 @@ export class PlanPage {
   async goBack() {
     console.debug('[PlanPage] Clicking back button');
     await this.backButton.click();
+  }
+
+  /** Open export dropdown and click PDF */
+  async clickExportPdf() {
+    console.debug('[PlanPage] Clicking export PDF');
+    await this.exportDropdown.click();
+    await this.exportPdfItem.click();
+  }
+
+  /** Open export dropdown and click DOCX */
+  async clickExportDocx() {
+    console.debug('[PlanPage] Clicking export DOCX');
+    await this.exportDropdown.click();
+    await this.exportDocxItem.click();
+  }
+
+  /** Check if export dropdown is visible */
+  async isExportAvailable(): Promise<boolean> {
+    return this.exportDropdown.isVisible();
   }
 
   /** Check if loading spinner is visible */

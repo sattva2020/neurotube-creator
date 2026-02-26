@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Hono } from 'hono';
 import { plansRoutes } from '../plans.js';
 import type { GeneratePlan } from '../../../application/use-cases/GeneratePlan.js';
+import type { ExportPlan } from '../../../application/use-cases/ExportPlan.js';
 import type { IPlanRepository } from '../../../domain/ports/IPlanRepository.js';
 import type { VideoPlan } from '../../../domain/entities/VideoPlan.js';
 import type { AuthVariables } from '../../middleware/authMiddleware.js';
@@ -25,6 +26,7 @@ describe('Plans Routes', () => {
     findById: ReturnType<typeof vi.fn>;
     delete: ReturnType<typeof vi.fn>;
   };
+  let mockExportPlan: { execute: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
     mockGeneratePlan = { execute: vi.fn().mockResolvedValue(mockPlan) };
@@ -33,6 +35,13 @@ describe('Plans Routes', () => {
       findAll: vi.fn().mockResolvedValue([mockPlan]),
       findById: vi.fn().mockResolvedValue(mockPlan),
       delete: vi.fn().mockResolvedValue(undefined),
+    };
+    mockExportPlan = {
+      execute: vi.fn().mockResolvedValue({
+        buffer: Buffer.from('mock-pdf'),
+        filename: 'brain-hacks-101.pdf',
+        contentType: 'application/pdf',
+      }),
     };
 
     app = new Hono<{ Variables: AuthVariables }>();
@@ -44,6 +53,7 @@ describe('Plans Routes', () => {
     app.route('/api/plans', plansRoutes(
       mockGeneratePlan as unknown as GeneratePlan,
       mockPlanRepo as unknown as IPlanRepository,
+      mockExportPlan as unknown as ExportPlan,
     ));
   });
 
@@ -123,6 +133,57 @@ describe('Plans Routes', () => {
       const res = await app.request('/api/plans/not-a-uuid', {
         method: 'DELETE',
       });
+
+      expect(res.status).toBe(400);
+    });
+  });
+
+  describe('GET /api/plans/:id/export', () => {
+    it('should export plan as PDF', async () => {
+      const res = await app.request('/api/plans/550e8400-e29b-41d4-a716-446655440000/export?format=pdf');
+
+      expect(res.status).toBe(200);
+      expect(res.headers.get('content-type')).toBe('application/pdf');
+      expect(res.headers.get('content-disposition')).toContain('brain-hacks-101.pdf');
+      expect(mockExportPlan.execute).toHaveBeenCalledWith('550e8400-e29b-41d4-a716-446655440000', 'pdf', userId);
+    });
+
+    it('should export plan as DOCX', async () => {
+      mockExportPlan.execute.mockResolvedValue({
+        buffer: Buffer.from('mock-docx'),
+        filename: 'brain-hacks-101.docx',
+        contentType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      });
+
+      const res = await app.request('/api/plans/550e8400-e29b-41d4-a716-446655440000/export?format=docx');
+
+      expect(res.status).toBe(200);
+      expect(res.headers.get('content-type')).toBe('application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+      expect(mockExportPlan.execute).toHaveBeenCalledWith('550e8400-e29b-41d4-a716-446655440000', 'docx', userId);
+    });
+
+    it('should return 404 when plan not found', async () => {
+      mockExportPlan.execute.mockRejectedValue(new Error('Plan not found'));
+
+      const res = await app.request('/api/plans/550e8400-e29b-41d4-a716-446655440000/export?format=pdf');
+
+      expect(res.status).toBe(404);
+    });
+
+    it('should return 400 for missing format query', async () => {
+      const res = await app.request('/api/plans/550e8400-e29b-41d4-a716-446655440000/export');
+
+      expect(res.status).toBe(400);
+    });
+
+    it('should return 400 for invalid format', async () => {
+      const res = await app.request('/api/plans/550e8400-e29b-41d4-a716-446655440000/export?format=txt');
+
+      expect(res.status).toBe(400);
+    });
+
+    it('should return 400 for invalid uuid', async () => {
+      const res = await app.request('/api/plans/not-a-uuid/export?format=pdf');
 
       expect(res.status).toBe(400);
     });

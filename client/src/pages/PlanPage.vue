@@ -42,16 +42,50 @@
     <div v-if="planStore.markdown && !planStore.isLoading && !loadingById" class="plan-content">
       <div class="row items-center justify-between q-mb-md">
         <span class="text-h5 text-weight-bold">{{ planTitle }}</span>
-        <q-btn
-          flat
-          round
-          icon="content_copy"
-          color="grey-7"
-          @click="copyToClipboard"
-        >
-          <q-tooltip>Копировать в буфер</q-tooltip>
-        </q-btn>
+        <div class="row q-gutter-sm">
+          <q-btn
+            flat
+            round
+            icon="content_copy"
+            color="grey-7"
+            @click="copyToClipboard"
+          >
+            <q-tooltip>Копировать в буфер</q-tooltip>
+          </q-btn>
+          <q-btn-dropdown
+            flat
+            round
+            icon="download"
+            color="grey-7"
+            :loading="isExporting"
+            :disable="!planStore.plan?.id"
+          >
+            <q-tooltip>Скачать план</q-tooltip>
+            <q-list>
+              <q-item clickable v-close-popup @click="handleExport('pdf')">
+                <q-item-section avatar>
+                  <q-icon name="picture_as_pdf" color="red-7" />
+                </q-item-section>
+                <q-item-section>Скачать PDF</q-item-section>
+              </q-item>
+              <q-item clickable v-close-popup @click="handleExport('docx')">
+                <q-item-section avatar>
+                  <q-icon name="description" color="blue-7" />
+                </q-item-section>
+                <q-item-section>Скачать DOCX</q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
+        </div>
       </div>
+
+      <!-- Export error -->
+      <q-banner v-if="exportError" class="bg-warning text-white q-mb-md" rounded>
+        <template #avatar>
+          <q-icon name="warning" />
+        </template>
+        {{ exportError }}
+      </q-banner>
 
       <!-- eslint-disable-next-line vue/no-v-html -->
       <div class="plan-markdown text-body1" v-html="renderedMarkdown" />
@@ -79,6 +113,7 @@ import { usePlanStore } from '@/stores/plan';
 import { useIdeasStore } from '@/stores/ideas';
 import { useGeneratePlan } from '@/composables/useGeneratePlan';
 import { usePlansHistory } from '@/composables/usePlansHistory';
+import { useExportPlan } from '@/composables/useExportPlan';
 import { useAnalytics } from '@/composables/useAnalytics';
 
 const md = new MarkdownIt({ html: false, linkify: true, typographer: true });
@@ -90,6 +125,7 @@ const ideasStore = useIdeasStore();
 const { generate } = useGeneratePlan();
 const { fetchById } = usePlansHistory();
 
+const { isExporting, exportError, exportPlan } = useExportPlan();
 const { trackEvent } = useAnalytics();
 
 const error = ref('');
@@ -137,6 +173,14 @@ async function generatePlan() {
     error.value = 'Не удалось сгенерировать план. Попробуйте ещё раз.';
     console.error('[PlanPage] Generate plan failed:', e);
   }
+}
+
+async function handleExport(format: 'pdf' | 'docx') {
+  const planId = planStore.plan?.id;
+  if (!planId) return;
+  console.debug('[PlanPage] Exporting plan', { planId, format });
+  trackEvent('plan_exported', { planId, format });
+  await exportPlan(planId, format);
 }
 
 function copyToClipboard() {

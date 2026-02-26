@@ -1,15 +1,17 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import type { GeneratePlan } from '../../application/use-cases/GeneratePlan.js';
+import type { ExportPlan } from '../../application/use-cases/ExportPlan.js';
 import type { IPlanRepository } from '../../domain/ports/IPlanRepository.js';
 import type { Niche } from '../../domain/entities/Niche.js';
+import type { ExportFormat } from '../../../../shared/types/export.js';
 import type { AuthVariables } from '../middleware/authMiddleware.js';
-import { generatePlanSchema, listPlansQuerySchema, uuidParamSchema } from '../schemas.js';
+import { generatePlanSchema, listPlansQuerySchema, uuidParamSchema, exportPlanQuerySchema } from '../schemas.js';
 import { createLogger } from '../../infrastructure/logger.js';
 
 const logger = createLogger('PlansRoute');
 
-export function plansRoutes(generatePlan: GeneratePlan, planRepo: IPlanRepository) {
+export function plansRoutes(generatePlan: GeneratePlan, planRepo: IPlanRepository, exportPlan: ExportPlan) {
   const app = new Hono<{ Variables: AuthVariables }>();
 
   app.post('/generate', zValidator('json', generatePlanSchema), async (c) => {
@@ -21,6 +23,30 @@ export function plansRoutes(generatePlan: GeneratePlan, planRepo: IPlanRepositor
     logger.info('Plan generated', { title, niche, planId: plan.id, userId });
 
     return c.json({ data: plan });
+  });
+
+  app.get('/:id/export', zValidator('param', uuidParamSchema), zValidator('query', exportPlanQuerySchema), async (c) => {
+    const { id } = c.req.valid('param');
+    const { format } = c.req.valid('query');
+    const { userId } = c.get('user');
+    logger.debug('GET /api/plans/:id/export', { id, format, userId });
+
+    try {
+      const result = await exportPlan.execute(id, format as ExportFormat, userId);
+      logger.info('Plan exported', { id, format, filename: result.filename, bytes: result.buffer.byteLength });
+
+      c.header('Content-Type', result.contentType);
+      c.header('Content-Disposition', `attachment; filename="${result.filename}"`);
+      c.header('Content-Length', result.buffer.byteLength.toString());
+
+      return c.body(result.buffer);
+    } catch (error) {
+      if (error instanceof Error && error.message === 'Plan not found') {
+        logger.info('Plan not found for export', { id, userId });
+        return c.json({ error: 'Plan not found' }, 404);
+      }
+      throw error;
+    }
   });
 
   app.get('/:id', zValidator('param', uuidParamSchema), async (c) => {

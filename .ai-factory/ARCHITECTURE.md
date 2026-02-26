@@ -56,6 +56,7 @@ neurotube-creator/
 │   │   │   ├── useApi.ts            # Base API client (get, post, del)
 │   │   │   ├── useIdeasHistory.ts   # Saved ideas CRUD (fetchAll, fetchById, remove)
 │   │   │   ├── usePlansHistory.ts   # Saved plans CRUD (fetchAll, fetchById, remove)
+│   │   │   ├── useExportPlan.ts    # Plan export to PDF/DOCX via download
 │   │   │   └── useAdminDashboard.ts # Admin dashboard: stats + activity logs
 │   │   ├── stores/                  # Pinia state management
 │   │   │   ├── ideas.ts             # Generated ideas store
@@ -86,6 +87,7 @@ neurotube-creator/
 │   │   │   │   └── ActivityLog.ts   # Activity log entity (admin audit trail)
 │   │   │   └── ports/               # Interfaces (contracts)
 │   │   │       ├── IAiService.ts    # AI generation contract
+│   │   │       ├── IDocumentExporter.ts   # Document export contract (PDF/DOCX)
 │   │   │       ├── IIdeaRepository.ts
 │   │   │       ├── IPlanRepository.ts
 │   │   │       ├── IUserRepository.ts      # User CRUD (auth)
@@ -117,7 +119,8 @@ neurotube-creator/
 │   │   │   │   ├── DeactivateUser.ts    # Admin: soft-delete user (rbac)
 │   │   │   │   ├── LogActivity.ts      # Save activity log entry (admin)
 │   │   │   │   ├── GetActivityLogs.ts  # Paginated activity logs (admin)
-│   │   │   │   └── GetAdminStats.ts    # Aggregate admin dashboard stats
+│   │   │   │   ├── GetAdminStats.ts    # Aggregate admin dashboard stats
+│   │   │   │   └── ExportPlan.ts      # Export plan to PDF/DOCX
 │   │   │   └── dto/                 # Input/output data transfer objects
 │   │   │       ├── GenerateIdeasInput.ts
 │   │   │       └── GenerateIdeasOutput.ts
@@ -133,6 +136,8 @@ neurotube-creator/
 │   │   │   │   ├── UserRepository.ts     # Implements IUserRepository (auth)
 │   │   │   │   ├── SessionRepository.ts  # Implements ISessionRepository (auth)
 │   │   │   │   └── ActivityLogRepository.ts # Implements IActivityLogRepository (admin)
+│   │   │   ├── export/
+│   │   │   │   └── DocumentExporter.ts  # Implements IDocumentExporter (pdfkit + docx + markdown-it)
 │   │   │   ├── auth/
 │   │   │   │   ├── BcryptHasher.ts      # Implements IPasswordHasher with bcryptjs
 │   │   │   │   └── JwtService.ts        # Implements ITokenService with jose
@@ -168,7 +173,8 @@ neurotube-creator/
 │       ├── idea.ts                  # VideoIdea, Niche
 │       ├── branding.ts             # ChannelBranding
 │       ├── auth.ts                  # Role, UserPublic, LoginRequest, AuthTokens, AuthResponse
-│       └── admin.ts                 # AdminStats, ActivityLogEntry, ActivityLogsResponse
+│       ├── admin.ts                 # AdminStats, ActivityLogEntry, ActivityLogsResponse
+│       └── export.ts                # ExportFormat, ExportResult
 │
 ├── docker-compose.yml               # Local dev: app + postgres
 ├── Dockerfile                       # Multi-stage: build client + server
@@ -467,6 +473,7 @@ export const plans = pgTable('plans', {
 | DELETE | `/api/ideas/:id` | — | Delete idea by ID |
 | GET | `/api/plans` | — | List saved plans |
 | GET | `/api/plans/:id` | — | Get plan by ID |
+| GET | `/api/plans/:id/export?format=pdf\|docx` | ExportPlan | Export plan to PDF or DOCX |
 | DELETE | `/api/plans/:id` | — | Delete plan by ID |
 | POST | `/api/auth/register` | Register | User registration |
 | POST | `/api/auth/login` | Login | User login |

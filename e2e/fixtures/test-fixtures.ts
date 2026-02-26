@@ -34,6 +34,7 @@ import {
   mockAdminStats,
   mockAdminActivityLogs,
   injectAuthTokens,
+  mockPlanExport,
 } from '../helpers/api-mock';
 
 /** Extended test fixtures with page objects and mock helpers */
@@ -73,6 +74,7 @@ type TestFixtures = {
     adminUsers: typeof mockAdminUsers;
     adminStats: typeof mockAdminStats;
     adminActivityLogs: typeof mockAdminActivityLogs;
+    planExport: typeof mockPlanExport;
   };
 };
 
@@ -161,6 +163,7 @@ export const test = base.extend<TestFixtures>({
       adminUsers: (p, users?) => mockAdminUsers(p ?? page, users),
       adminStats: (p, stats?) => mockAdminStats(p ?? page, stats),
       adminActivityLogs: (p, logs?) => mockAdminActivityLogs(p ?? page, logs),
+      planExport: (p?) => mockPlanExport(p ?? page),
     });
   },
 });

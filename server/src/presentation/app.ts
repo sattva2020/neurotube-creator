@@ -51,6 +51,7 @@ import type { DeactivateUser } from '../application/use-cases/DeactivateUser.js'
 import type { LogActivity } from '../application/use-cases/LogActivity.js';
 import type { GetActivityLogs } from '../application/use-cases/GetActivityLogs.js';
 import type { GetAdminStats } from '../application/use-cases/GetAdminStats.js';
+import type { ExportPlan } from '../application/use-cases/ExportPlan.js';
 
 const logger = createLogger('App');
 
@@ -82,6 +83,7 @@ export interface AppDeps {
   logActivity: LogActivity;
   getActivityLogs: GetActivityLogs;
   getAdminStats: GetAdminStats;
+  exportPlan: ExportPlan;
 }
 
 export function createApp(deps: AppDeps) {
@@ -98,7 +100,7 @@ export function createApp(deps: AppDeps) {
   // --- Routes ---
   app.route('/api/health', health);
   app.route('/api/ideas', ideasRoutes(deps.generateIdeas, deps.ideaRepo));
-  app.route('/api/plans', plansRoutes(deps.generatePlan, deps.planRepo));
+  app.route('/api/plans', plansRoutes(deps.generatePlan, deps.planRepo, deps.exportPlan));
   app.route('/api/thumbnails', thumbnailsRoutes(deps.generateThumbnail));
   app.route('/api/titles', titlesRoutes(deps.generateTitles));
   app.route('/api/descriptions', descriptionsRoutes(deps.generateDescription));

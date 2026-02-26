@@ -41,6 +41,11 @@ export const listPlansQuerySchema = z.object({
   niche: nicheSchema.optional(),
 });
 
+/** GET /api/plans/:id/export?format=pdf|docx */
+export const exportPlanQuerySchema = z.object({
+  format: z.enum(['pdf', 'docx']),
+});
+
 /** POST /api/thumbnails/generate */
 export const generateThumbnailSchema = z.object({
   prompt: promptSchema,

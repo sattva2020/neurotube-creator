@@ -27,6 +27,7 @@
 - [x] **User-Scoped Data** — userId в таблицах ideas/plans, миграция, фильтрация данных по пользователю, обновление репозиториев
 - [x] **Admin Panel** — Управление пользователями, назначение ролей, просмотр активности, административный дашборд
 - [x] **Auth E2E Testing** — Playwright-тесты для авторизации: регистрация, логин, защищённые маршруты, RBAC
+- [x] **Export Plans (PDF & DOCX)** — Серверный экспорт планов в PDF/DOCX через pdfkit/docx, API endpoint, кнопки скачивания во фронтенде, тесты
 
 ## Completed
 
@@ -55,3 +56,4 @@
 | Auth E2E Testing | 2026-02-26 |
 | User-Scoped Data | 2026-02-26 |
 | Admin Panel | 2026-02-26 |
+| Export Plans (PDF & DOCX) | 2026-02-26 |

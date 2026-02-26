@@ -33,6 +33,8 @@ import { DeactivateUser } from './application/use-cases/DeactivateUser.js';
 import { LogActivity } from './application/use-cases/LogActivity.js';
 import { GetActivityLogs } from './application/use-cases/GetActivityLogs.js';
 import { GetAdminStats } from './application/use-cases/GetAdminStats.js';
+import { ExportPlan } from './application/use-cases/ExportPlan.js';
+import { DocumentExporter } from './infrastructure/export/DocumentExporter.js';
 import { PostHogService } from './infrastructure/analytics/index.js';
 import { createApp } from './presentation/app.js';
 
@@ -51,7 +53,8 @@ const sessionRepo = new SessionRepository(db);
 const passwordHasher = new BcryptHasher();
 const tokenService = new JwtService(env.JWT_SECRET, env.JWT_ACCESS_EXPIRES_IN);
 const activityLogRepo = new ActivityLogRepository(db);
-logger.debug('Auth infrastructure initialized');
+const documentExporter = new DocumentExporter();
+logger.debug('Auth & export infrastructure initialized');
 
 // --- Use cases ---
 logger.debug('Wiring application use cases');
@@ -78,7 +81,8 @@ const deactivateUser = new DeactivateUser(userRepo);
 const logActivity = new LogActivity(activityLogRepo);
 const getActivityLogs = new GetActivityLogs(activityLogRepo);
 const getAdminStats = new GetAdminStats(userRepo, ideaRepo, planRepo);
-logger.debug('Auth & admin use cases initialized');
+const exportPlan = new ExportPlan(planRepo, documentExporter);
+logger.debug('Auth, admin & export use cases initialized');
 
 // --- Presentation ---
 const app = createApp({
@@ -109,6 +113,7 @@ const app = createApp({
   logActivity,
   getActivityLogs,
   getAdminStats,
+  exportPlan,
 });
 
 // --- Start server ---

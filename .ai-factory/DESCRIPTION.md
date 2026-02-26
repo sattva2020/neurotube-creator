@@ -23,6 +23,7 @@ AI-powered YouTube idea generator and script outliner for psychology/neuroscienc
 - **Auth Frontend:** Login/Register pages, auth store with JWT token management, route guards (requiresAuth, requiresRole, guest), 401 auto-refresh, admin user management page, user info in toolbar
 - **Admin Panel:** Tabbed admin dashboard with stats (users, ideas, plans, registrations), role distribution visualization, user management table (role editing, deactivation), paginated activity log with action filters
 - **Activity Logging:** Audit trail for admin and auth actions (role changes, deactivation, registration, login) with IP tracking and metadata
+- **Plan Export:** Server-side export of video plans to PDF (pdfkit) and DOCX (docx library) with markdown parsing (markdown-it), download buttons in frontend
 
 ## Tech Stack
 
@@ -42,6 +43,7 @@ AI-powered YouTube idea generator and script outliner for psychology/neuroscienc
 - **AI Provider:** Google Gemini API (`@google/genai`) — gemini-3-flash-preview (text), gemini-3-pro-image-preview (images)
 - **Analytics:** PostHog (`posthog-node`) — opt-in server-side event tracking and API metrics
 - **Auth:** `jose` (JWT HS256 access tokens), `bcryptjs` (password hashing)
+- **Document Export:** `pdfkit` (PDF generation), `docx` (DOCX generation), `markdown-it` (markdown parsing)
 
 ### Database
 - **Database:** PostgreSQL

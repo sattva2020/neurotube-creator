@@ -207,6 +207,34 @@ export async function mockPlanDelete(page: Page) {
   });
 }
 
+/** Mock GET /api/plans/:id/export — returns binary file response */
+export async function mockPlanExport(page: Page) {
+  log('Setting up mock: GET /api/plans/:id/export');
+  await page.route(new RegExp('/api/plans/[^/]+/export'), async (route) => {
+    if (route.request().method() === 'GET') {
+      const url = route.request().url();
+      const format = new URL(url).searchParams.get('format') || 'pdf';
+      log(`Intercepted GET /api/plans/:id/export?format=${format}`, { url });
+
+      const contentTypes: Record<string, string> = {
+        pdf: 'application/pdf',
+        docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      };
+
+      await route.fulfill({
+        status: 200,
+        contentType: contentTypes[format] ?? 'application/octet-stream',
+        headers: {
+          'Content-Disposition': `attachment; filename="mock-plan.${format}"`,
+        },
+        body: Buffer.from(`mock-${format}-content`),
+      });
+    } else {
+      await route.continue();
+    }
+  });
+}
+
 /** Mock GET /api/health — returns healthy status */
 export async function mockHealth(page: Page) {
   log('Setting up mock: GET /api/health');
