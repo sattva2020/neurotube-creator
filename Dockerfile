@@ -45,10 +45,7 @@ COPY --from=builder /app/shared/dist/ ./shared/dist/
 COPY server/drizzle/ ./server/drizzle/
 COPY server/drizzle.config.ts ./server/
 
-# Copy entrypoint
-COPY docker-entrypoint.sh ./
-RUN chmod +x docker-entrypoint.sh
-
 EXPOSE 3000
 
-ENTRYPOINT ["./docker-entrypoint.sh"]
+# Temporarily skip entrypoint to test if build + prod stage work
+CMD ["node", "server/dist/index.js"]
