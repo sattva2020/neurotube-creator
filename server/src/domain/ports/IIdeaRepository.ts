@@ -14,4 +14,7 @@ export interface IIdeaRepository {
 
   /** Delete an idea by ID, optionally scoped to user */
   delete(id: string, userId?: string): Promise<void>;
+
+  /** Count total ideas across all users (admin stats) */
+  countAll(): Promise<number>;
 }

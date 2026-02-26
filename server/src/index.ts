@@ -8,6 +8,7 @@ import { IdeaRepository } from './infrastructure/db/IdeaRepository.js';
 import { PlanRepository } from './infrastructure/db/PlanRepository.js';
 import { UserRepository } from './infrastructure/db/UserRepository.js';
 import { SessionRepository } from './infrastructure/db/SessionRepository.js';
+import { ActivityLogRepository } from './infrastructure/db/ActivityLogRepository.js';
 import { BcryptHasher } from './infrastructure/auth/BcryptHasher.js';
 import { JwtService } from './infrastructure/auth/JwtService.js';
 import { GenerateIdeas } from './application/use-cases/GenerateIdeas.js';
@@ -29,6 +30,9 @@ import { Logout } from './application/use-cases/Logout.js';
 import { GetAllUsers } from './application/use-cases/GetAllUsers.js';
 import { UpdateUserRole } from './application/use-cases/UpdateUserRole.js';
 import { DeactivateUser } from './application/use-cases/DeactivateUser.js';
+import { LogActivity } from './application/use-cases/LogActivity.js';
+import { GetActivityLogs } from './application/use-cases/GetActivityLogs.js';
+import { GetAdminStats } from './application/use-cases/GetAdminStats.js';
 import { PostHogService } from './infrastructure/analytics/index.js';
 import { createApp } from './presentation/app.js';
 
@@ -46,6 +50,7 @@ const userRepo = new UserRepository(db);
 const sessionRepo = new SessionRepository(db);
 const passwordHasher = new BcryptHasher();
 const tokenService = new JwtService(env.JWT_SECRET, env.JWT_ACCESS_EXPIRES_IN);
+const activityLogRepo = new ActivityLogRepository(db);
 logger.debug('Auth infrastructure initialized');
 
 // --- Use cases ---
@@ -70,6 +75,9 @@ const logout = new Logout(sessionRepo);
 const getAllUsers = new GetAllUsers(userRepo);
 const updateUserRole = new UpdateUserRole(userRepo);
 const deactivateUser = new DeactivateUser(userRepo);
+const logActivity = new LogActivity(activityLogRepo);
+const getActivityLogs = new GetActivityLogs(activityLogRepo);
+const getAdminStats = new GetAdminStats(userRepo, ideaRepo, planRepo);
 logger.debug('Auth & admin use cases initialized');
 
 // --- Presentation ---
@@ -98,6 +106,9 @@ const app = createApp({
   getAllUsers,
   updateUserRole,
   deactivateUser,
+  logActivity,
+  getActivityLogs,
+  getAdminStats,
 });
 
 // --- Start server ---

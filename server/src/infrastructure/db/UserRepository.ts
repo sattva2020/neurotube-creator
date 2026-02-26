@@ -1,4 +1,4 @@
-import { eq, desc, count as sqlCount } from 'drizzle-orm';
+import { eq, desc, count as sqlCount, and, gte } from 'drizzle-orm';
 import type { IUserRepository } from '../../domain/ports/IUserRepository.js';
 import type { User } from '../../domain/entities/User.js';
 import type { Role } from '../../domain/entities/Role.js';
@@ -157,6 +157,56 @@ export class UserRepository implements IUserRepository {
     const total = Number(row.value);
     const elapsed = Date.now() - start;
     logger.info('count() completed', { total, elapsed });
+    return total;
+  }
+
+  async countActive(): Promise<number> {
+    const start = Date.now();
+    logger.debug('countActive() called');
+
+    const [row] = await this.db
+      .select({ value: sqlCount() })
+      .from(users)
+      .where(eq(users.isActive, true));
+
+    const total = Number(row.value);
+    const elapsed = Date.now() - start;
+    logger.info('countActive() completed', { total, elapsed });
+    return total;
+  }
+
+  async countByRole(): Promise<Record<string, number>> {
+    const start = Date.now();
+    logger.debug('countByRole() called');
+
+    const rows = await this.db
+      .select({ role: users.role, value: sqlCount() })
+      .from(users)
+      .where(eq(users.isActive, true))
+      .groupBy(users.role);
+
+    const result: Record<string, number> = {};
+    for (const row of rows) {
+      result[row.role] = Number(row.value);
+    }
+
+    const elapsed = Date.now() - start;
+    logger.info('countByRole() completed', { result, elapsed });
+    return result;
+  }
+
+  async countSince(since: Date): Promise<number> {
+    const start = Date.now();
+    logger.debug('countSince() called', { since: since.toISOString() });
+
+    const [row] = await this.db
+      .select({ value: sqlCount() })
+      .from(users)
+      .where(and(gte(users.createdAt, since)));
+
+    const total = Number(row.value);
+    const elapsed = Date.now() - start;
+    logger.info('countSince() completed', { total, elapsed });
     return total;
   }
 

@@ -14,4 +14,7 @@ export interface IPlanRepository {
 
   /** Delete a plan by ID, optionally scoped to user */
   delete(id: string, userId?: string): Promise<void>;
+
+  /** Count total plans across all users (admin stats) */
+  countAll(): Promise<number>;
 }

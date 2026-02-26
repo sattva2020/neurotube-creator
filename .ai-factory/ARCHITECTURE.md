@@ -55,7 +55,8 @@ neurotube-creator/
 │   │   │   ├── useGeneratePlan.ts   # Plan generation logic
 │   │   │   ├── useApi.ts            # Base API client (get, post, del)
 │   │   │   ├── useIdeasHistory.ts   # Saved ideas CRUD (fetchAll, fetchById, remove)
-│   │   │   └── usePlansHistory.ts   # Saved plans CRUD (fetchAll, fetchById, remove)
+│   │   │   ├── usePlansHistory.ts   # Saved plans CRUD (fetchAll, fetchById, remove)
+│   │   │   └── useAdminDashboard.ts # Admin dashboard: stats + activity logs
 │   │   ├── stores/                  # Pinia state management
 │   │   │   ├── ideas.ts             # Generated ideas store
 │   │   │   ├── plan.ts              # Current plan store
@@ -81,7 +82,8 @@ neurotube-creator/
 │   │   │   │   ├── Niche.ts         # Niche value object
 │   │   │   │   ├── User.ts          # User entity (auth)
 │   │   │   │   ├── Role.ts          # Role type + ROLE_HIERARCHY (auth)
-│   │   │   │   └── Session.ts       # Session entity — refresh tokens (auth)
+│   │   │   │   ├── Session.ts       # Session entity — refresh tokens (auth)
+│   │   │   │   └── ActivityLog.ts   # Activity log entity (admin audit trail)
 │   │   │   └── ports/               # Interfaces (contracts)
 │   │   │       ├── IAiService.ts    # AI generation contract
 │   │   │       ├── IIdeaRepository.ts
@@ -89,7 +91,8 @@ neurotube-creator/
 │   │   │       ├── IUserRepository.ts      # User CRUD (auth)
 │   │   │       ├── ISessionRepository.ts   # Session management (auth)
 │   │   │       ├── IPasswordHasher.ts      # Password hashing abstraction (auth)
-│   │   │       └── ITokenService.ts       # JWT token generation/verification (auth)
+│   │   │       ├── ITokenService.ts       # JWT token generation/verification (auth)
+│   │   │       └── IActivityLogRepository.ts # Activity log CRUD (admin)
 │   │   │
 │   │   ├── application/             # 🟡 USE CASES (depends on domain only)
 │   │   │   ├── use-cases/
@@ -111,7 +114,10 @@ neurotube-creator/
 │   │   │   │   ├── Logout.ts            # Session invalidation (auth)
 │   │   │   │   ├── GetAllUsers.ts       # Admin: list all users (rbac)
 │   │   │   │   ├── UpdateUserRole.ts    # Admin: change user role (rbac)
-│   │   │   │   └── DeactivateUser.ts    # Admin: soft-delete user (rbac)
+│   │   │   │   ├── DeactivateUser.ts    # Admin: soft-delete user (rbac)
+│   │   │   │   ├── LogActivity.ts      # Save activity log entry (admin)
+│   │   │   │   ├── GetActivityLogs.ts  # Paginated activity logs (admin)
+│   │   │   │   └── GetAdminStats.ts    # Aggregate admin dashboard stats
 │   │   │   └── dto/                 # Input/output data transfer objects
 │   │   │       ├── GenerateIdeasInput.ts
 │   │   │       └── GenerateIdeasOutput.ts
@@ -120,12 +126,13 @@ neurotube-creator/
 │   │   │   ├── ai/
 │   │   │   │   └── GeminiAiService.ts    # Implements IAiService with @google/genai
 │   │   │   ├── db/
-│   │   │   │   ├── schema.ts             # Drizzle ORM schema (ideas, plans, users, sessions)
+│   │   │   │   ├── schema.ts             # Drizzle ORM schema (ideas, plans, users, sessions, activity_logs)
 │   │   │   │   ├── migrate.ts            # Migration runner
 │   │   │   │   ├── IdeaRepository.ts     # Implements IIdeaRepository
 │   │   │   │   ├── PlanRepository.ts     # Implements IPlanRepository
 │   │   │   │   ├── UserRepository.ts     # Implements IUserRepository (auth)
-│   │   │   │   └── SessionRepository.ts  # Implements ISessionRepository (auth)
+│   │   │   │   ├── SessionRepository.ts  # Implements ISessionRepository (auth)
+│   │   │   │   └── ActivityLogRepository.ts # Implements IActivityLogRepository (admin)
 │   │   │   ├── auth/
 │   │   │   │   ├── BcryptHasher.ts      # Implements IPasswordHasher with bcryptjs
 │   │   │   │   └── JwtService.ts        # Implements ITokenService with jose
@@ -160,7 +167,8 @@ neurotube-creator/
 │       ├── api.ts                   # API request/response types
 │       ├── idea.ts                  # VideoIdea, Niche
 │       ├── branding.ts             # ChannelBranding
-│       └── auth.ts                  # Role, UserPublic, LoginRequest, AuthTokens, AuthResponse
+│       ├── auth.ts                  # Role, UserPublic, LoginRequest, AuthTokens, AuthResponse
+│       └── admin.ts                 # AdminStats, ActivityLogEntry, ActivityLogsResponse
 │
 ├── docker-compose.yml               # Local dev: app + postgres
 ├── Dockerfile                       # Multi-stage: build client + server
@@ -468,6 +476,8 @@ export const plans = pgTable('plans', {
 | GET | `/api/admin/users` | GetAllUsers | List all users (admin+) |
 | PATCH | `/api/admin/users/:id/role` | UpdateUserRole | Change user role (admin+) |
 | POST | `/api/admin/users/:id/deactivate` | DeactivateUser | Deactivate user (admin+) |
+| GET | `/api/admin/stats` | GetAdminStats | Admin dashboard statistics (admin+) |
+| GET | `/api/admin/activity-logs` | GetActivityLogs | Paginated activity logs (admin+) |
 
 ## Anti-Patterns
 

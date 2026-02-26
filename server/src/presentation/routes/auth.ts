@@ -5,6 +5,7 @@ import type { Login } from '../../application/use-cases/Login.js';
 import type { RefreshTokens } from '../../application/use-cases/RefreshTokens.js';
 import type { Logout } from '../../application/use-cases/Logout.js';
 import type { IUserRepository } from '../../domain/ports/IUserRepository.js';
+import type { LogActivity } from '../../application/use-cases/LogActivity.js';
 import type { User } from '../../domain/entities/User.js';
 import type { AuthVariables } from '../middleware/authMiddleware.js';
 import { registerSchema, loginSchema, refreshSchema, logoutSchema } from '../schemas.js';
@@ -38,11 +39,12 @@ export interface AuthRoutesDeps {
   refreshTokens: RefreshTokens;
   logout: Logout;
   userRepo: IUserRepository;
+  logActivity: LogActivity;
 }
 
 export function authRoutes(deps: AuthRoutesDeps) {
   const app = new Hono<{ Variables: AuthVariables }>();
-  const { register, login, refreshTokens, logout, userRepo } = deps;
+  const { register, login, refreshTokens, logout, userRepo, logActivity } = deps;
 
   app.post('/register', zValidator('json', registerSchema), async (c) => {
     const body = c.req.valid('json');
@@ -51,6 +53,14 @@ export function authRoutes(deps: AuthRoutesDeps) {
     try {
       const result = await register.execute(body, extractMeta(c));
       logger.info('User registered', { userId: result.user.id });
+
+      logActivity.execute({
+        userId: result.user.id!,
+        action: 'user.registered',
+        resourceType: 'user',
+        resourceId: result.user.id,
+        ipAddress: c.req.header('x-forwarded-for') || c.req.header('x-real-ip'),
+      }).catch((err) => logger.error('Failed to log activity', { error: String(err) }));
 
       return c.json({
         data: {
@@ -74,6 +84,14 @@ export function authRoutes(deps: AuthRoutesDeps) {
     try {
       const result = await login.execute(body, extractMeta(c));
       logger.info('User logged in', { userId: result.user.id });
+
+      logActivity.execute({
+        userId: result.user.id!,
+        action: 'user.login',
+        resourceType: 'user',
+        resourceId: result.user.id,
+        ipAddress: c.req.header('x-forwarded-for') || c.req.header('x-real-ip'),
+      }).catch((err) => logger.error('Failed to log activity', { error: String(err) }));
 
       return c.json({
         data: {

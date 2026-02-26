@@ -172,7 +172,7 @@ test.describe('Auth Flow', () => {
       await page.waitForLoadState('networkidle');
 
       // Admin page should show the user table
-      await expect(page.locator('.text-h5').filter({ hasText: 'Управление' })).toBeVisible();
+      await expect(page.locator('.text-h5').filter({ hasText: 'Панель администратора' })).toBeVisible();
     });
 
     test('admin nav item visible only for admin users', async ({ page, setupMocks }) => {

@@ -4,6 +4,8 @@ import { adminRoutes } from '../admin.js';
 import type { GetAllUsers } from '../../../application/use-cases/GetAllUsers.js';
 import type { UpdateUserRole } from '../../../application/use-cases/UpdateUserRole.js';
 import type { DeactivateUser } from '../../../application/use-cases/DeactivateUser.js';
+import { LogActivity } from '../../../application/use-cases/LogActivity.js';
+import type { IActivityLogRepository } from '../../../domain/ports/IActivityLogRepository.js';
 import type { User } from '../../../domain/entities/User.js';
 import type { AuthVariables, AuthUser } from '../../middleware/authMiddleware.js';
 
@@ -38,6 +40,14 @@ function createApp(actorOverrides?: Partial<AuthUser>) {
   const getAllUsers: GetAllUsers = { execute: vi.fn().mockResolvedValue(mockUsers) } as any;
   const updateUserRole: UpdateUserRole = { execute: vi.fn().mockResolvedValue({ ...mockUsers[1], role: 'editor' }) } as any;
   const deactivateUser: DeactivateUser = { execute: vi.fn().mockResolvedValue({ ...mockUsers[1], isActive: false }) } as any;
+  const activityLogRepo: IActivityLogRepository = {
+    save: vi.fn().mockResolvedValue({ id: 'log-1', userId: '', action: '', createdAt: new Date() }),
+    findAll: vi.fn().mockResolvedValue([]),
+    count: vi.fn().mockResolvedValue(0),
+  };
+  const logActivity = new LogActivity(activityLogRepo);
+  const getActivityLogs = { execute: vi.fn().mockResolvedValue({ logs: [], total: 0 }) } as any;
+  const getAdminStats = { execute: vi.fn().mockResolvedValue({ totalUsers: 2, activeUsers: 2, totalIdeas: 0, totalPlans: 0, recentRegistrations: 0, roleDistribution: {} }) } as any;
 
   const app = new Hono<{ Variables: AuthVariables }>();
 
@@ -53,9 +63,9 @@ function createApp(actorOverrides?: Partial<AuthUser>) {
     await next();
   });
 
-  app.route('/api/admin', adminRoutes({ getAllUsers, updateUserRole, deactivateUser }));
+  app.route('/api/admin', adminRoutes({ getAllUsers, updateUserRole, deactivateUser, logActivity, getActivityLogs, getAdminStats }));
 
-  return { app, getAllUsers, updateUserRole, deactivateUser };
+  return { app, getAllUsers, updateUserRole, deactivateUser, getActivityLogs, getAdminStats };
 }
 
 describe('admin routes', () => {
@@ -197,6 +207,56 @@ describe('admin routes', () => {
         method: 'POST',
       });
       expect(res.status).toBe(400);
+    });
+  });
+
+  describe('GET /api/admin/stats', () => {
+    it('should return admin stats for admin+', async () => {
+      const { app } = createApp({ role: 'owner' });
+      const res = await app.request('/api/admin/stats');
+      expect(res.status).toBe(200);
+
+      const body = await res.json() as any;
+      expect(body.data.stats).toBeDefined();
+      expect(body.data.stats.totalUsers).toBe(2);
+      expect(body.data.stats.activeUsers).toBe(2);
+    });
+
+    it('should deny access for editor', async () => {
+      const { app } = createApp({ role: 'editor' });
+      const res = await app.request('/api/admin/stats');
+      expect(res.status).toBe(403);
+    });
+  });
+
+  describe('GET /api/admin/activity-logs', () => {
+    it('should return activity logs for admin+', async () => {
+      const { app } = createApp({ role: 'owner' });
+      const res = await app.request('/api/admin/activity-logs');
+      expect(res.status).toBe(200);
+
+      const body = await res.json() as any;
+      expect(body.data.logs).toBeDefined();
+      expect(body.data.total).toBeDefined();
+    });
+
+    it('should pass query params to use case', async () => {
+      const { app, getActivityLogs } = createApp({ role: 'admin' });
+      await app.request('/api/admin/activity-logs?limit=10&offset=5&action=user.login');
+
+      expect(getActivityLogs.execute).toHaveBeenCalledWith(
+        expect.objectContaining({
+          filters: expect.objectContaining({ action: 'user.login' }),
+          limit: 10,
+          offset: 5,
+        }),
+      );
+    });
+
+    it('should deny access for viewer', async () => {
+      const { app } = createApp({ role: 'viewer' });
+      const res = await app.request('/api/admin/activity-logs');
+      expect(res.status).toBe(403);
     });
   });
 });

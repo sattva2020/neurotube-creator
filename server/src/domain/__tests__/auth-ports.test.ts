@@ -27,6 +27,9 @@ describe('IUserRepository port', () => {
       deactivate: vi.fn().mockResolvedValue(mockUser),
       findAll: vi.fn().mockResolvedValue([mockUser]),
       count: vi.fn().mockResolvedValue(1),
+      countActive: vi.fn().mockResolvedValue(0),
+      countByRole: vi.fn().mockResolvedValue({}),
+      countSince: vi.fn().mockResolvedValue(0),
     };
 
     expect(repo.save).toBeDefined();
@@ -49,6 +52,9 @@ describe('IUserRepository port', () => {
       deactivate: vi.fn().mockResolvedValue(null),
       findAll: vi.fn().mockResolvedValue([]),
       count: vi.fn().mockResolvedValue(0),
+      countActive: vi.fn().mockResolvedValue(0),
+      countByRole: vi.fn().mockResolvedValue({}),
+      countSince: vi.fn().mockResolvedValue(0),
     };
 
     expect(await repo.findByEmail('nonexistent@test.com')).toBeNull();

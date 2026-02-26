@@ -48,6 +48,9 @@ import { createGlobalAuthGuard } from './middleware/authMiddleware.js';
 import type { GetAllUsers } from '../application/use-cases/GetAllUsers.js';
 import type { UpdateUserRole } from '../application/use-cases/UpdateUserRole.js';
 import type { DeactivateUser } from '../application/use-cases/DeactivateUser.js';
+import type { LogActivity } from '../application/use-cases/LogActivity.js';
+import type { GetActivityLogs } from '../application/use-cases/GetActivityLogs.js';
+import type { GetAdminStats } from '../application/use-cases/GetAdminStats.js';
 
 const logger = createLogger('App');
 
@@ -76,6 +79,9 @@ export interface AppDeps {
   getAllUsers: GetAllUsers;
   updateUserRole: UpdateUserRole;
   deactivateUser: DeactivateUser;
+  logActivity: LogActivity;
+  getActivityLogs: GetActivityLogs;
+  getAdminStats: GetAdminStats;
 }
 
 export function createApp(deps: AppDeps) {
@@ -109,11 +115,15 @@ export function createApp(deps: AppDeps) {
     refreshTokens: deps.refreshTokens,
     logout: deps.logout,
     userRepo: deps.userRepo,
+    logActivity: deps.logActivity,
   }));
   app.route('/api/admin', adminRoutes({
     getAllUsers: deps.getAllUsers,
     updateUserRole: deps.updateUserRole,
     deactivateUser: deps.deactivateUser,
+    logActivity: deps.logActivity,
+    getActivityLogs: deps.getActivityLogs,
+    getAdminStats: deps.getAdminStats,
   }));
 
   // --- Static file serving (SPA) ---

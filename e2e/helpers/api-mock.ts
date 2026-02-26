@@ -14,6 +14,8 @@ import {
   MOCK_AUTH_RESPONSE,
   MOCK_AUTH_USER,
   MOCK_ADMIN_USERS,
+  MOCK_ADMIN_STATS,
+  MOCK_ACTIVITY_LOGS,
 } from './test-data';
 
 const DEBUG = process.env.E2E_DEBUG === 'true';
@@ -313,6 +315,32 @@ export async function mockAdminUsers(page: Page, adminUsers = MOCK_ADMIN_USERS) 
   });
 }
 
+/** Mock GET /api/admin/stats — returns mock admin stats */
+export async function mockAdminStats(page: Page, stats = MOCK_ADMIN_STATS) {
+  log('Setting up mock: GET /api/admin/stats');
+  await page.route('**/api/admin/stats', async (route) => {
+    if (route.request().method() === 'GET') {
+      log('Intercepted GET /api/admin/stats');
+      await fulfillJson(route, { stats });
+    } else {
+      await route.continue();
+    }
+  });
+}
+
+/** Mock GET /api/admin/activity-logs — returns mock activity logs */
+export async function mockAdminActivityLogs(page: Page, activityLogs = MOCK_ACTIVITY_LOGS) {
+  log('Setting up mock: GET /api/admin/activity-logs');
+  await page.route('**/api/admin/activity-logs*', async (route) => {
+    if (route.request().method() === 'GET') {
+      log('Intercepted GET /api/admin/activity-logs');
+      await fulfillJson(route, activityLogs);
+    } else {
+      await route.continue();
+    }
+  });
+}
+
 /** Set up all auth API mocks */
 export async function mockAllAuthRoutes(page: Page) {
   log('Setting up all auth API mocks');
@@ -322,6 +350,8 @@ export async function mockAllAuthRoutes(page: Page) {
   await mockAuthLogout(page);
   await mockAuthMe(page);
   await mockAdminUsers(page);
+  await mockAdminStats(page);
+  await mockAdminActivityLogs(page);
 }
 
 /** Inject auth tokens into localStorage so the app starts authenticated */

@@ -7,6 +7,8 @@ import type { RefreshTokens } from '../../../application/use-cases/RefreshTokens
 import type { Logout } from '../../../application/use-cases/Logout.js';
 import type { ITokenService } from '../../../domain/ports/ITokenService.js';
 import type { IUserRepository } from '../../../domain/ports/IUserRepository.js';
+import { LogActivity } from '../../../application/use-cases/LogActivity.js';
+import type { IActivityLogRepository } from '../../../domain/ports/IActivityLogRepository.js';
 import type { User } from '../../../domain/entities/User.js';
 import { createGlobalAuthGuard } from '../../middleware/authMiddleware.js';
 
@@ -48,6 +50,11 @@ function createMocks() {
       findAll: vi.fn(),
       count: vi.fn().mockResolvedValue(0),
     } as unknown as IUserRepository,
+    logActivity: new LogActivity({
+      save: vi.fn().mockResolvedValue({ id: 'log-1', userId: '', action: '', createdAt: new Date() }),
+      findAll: vi.fn().mockResolvedValue([]),
+      count: vi.fn().mockResolvedValue(0),
+    } as IActivityLogRepository),
   };
 }
 

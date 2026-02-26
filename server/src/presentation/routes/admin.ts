@@ -3,10 +3,13 @@ import { zValidator } from '@hono/zod-validator';
 import type { GetAllUsers } from '../../application/use-cases/GetAllUsers.js';
 import type { UpdateUserRole } from '../../application/use-cases/UpdateUserRole.js';
 import type { DeactivateUser } from '../../application/use-cases/DeactivateUser.js';
+import type { LogActivity } from '../../application/use-cases/LogActivity.js';
+import type { GetActivityLogs } from '../../application/use-cases/GetActivityLogs.js';
+import type { GetAdminStats } from '../../application/use-cases/GetAdminStats.js';
 import type { User } from '../../domain/entities/User.js';
 import type { AuthVariables } from '../middleware/authMiddleware.js';
 import { createRequireRole } from '../middleware/authMiddleware.js';
-import { updateUserRoleSchema, uuidParamSchema } from '../schemas.js';
+import { updateUserRoleSchema, uuidParamSchema, activityLogsQuerySchema } from '../schemas.js';
 import { createLogger } from '../../infrastructure/logger.js';
 
 const logger = createLogger('AdminRoutes');
@@ -27,11 +30,14 @@ export interface AdminRoutesDeps {
   getAllUsers: GetAllUsers;
   updateUserRole: UpdateUserRole;
   deactivateUser: DeactivateUser;
+  logActivity: LogActivity;
+  getActivityLogs: GetActivityLogs;
+  getAdminStats: GetAdminStats;
 }
 
 export function adminRoutes(deps: AdminRoutesDeps) {
   const app = new Hono<{ Variables: AuthVariables }>();
-  const { getAllUsers, updateUserRole, deactivateUser } = deps;
+  const { getAllUsers, updateUserRole, deactivateUser, logActivity, getActivityLogs, getAdminStats } = deps;
   const requireAdmin = createRequireRole('admin');
 
   // All admin routes require at least admin role
@@ -73,6 +79,15 @@ export function adminRoutes(deps: AdminRoutesDeps) {
         actorRole: actor.role,
       });
 
+      logActivity.execute({
+        userId: actor.userId,
+        action: 'user.role_updated',
+        resourceType: 'user',
+        resourceId: id,
+        metadata: { newRole: role, previousRole: undefined },
+        ipAddress: c.req.header('x-forwarded-for') || c.req.header('x-real-ip'),
+      }).catch((err) => logger.error('Failed to log activity', { error: String(err) }));
+
       logger.info('User role updated', { targetId: id, newRole: role, actorId: actor.userId });
       return c.json({ data: toPublicUser(updated) });
     } catch (err) {
@@ -110,6 +125,14 @@ export function adminRoutes(deps: AdminRoutesDeps) {
         actorRole: actor.role,
       });
 
+      logActivity.execute({
+        userId: actor.userId,
+        action: 'user.deactivated',
+        resourceType: 'user',
+        resourceId: id,
+        ipAddress: c.req.header('x-forwarded-for') || c.req.header('x-real-ip'),
+      }).catch((err) => logger.error('Failed to log activity', { error: String(err) }));
+
       logger.info('User deactivated', { targetId: id, actorId: actor.userId });
       return c.json({ data: toPublicUser(deactivated) });
     } catch (err) {
@@ -126,6 +149,39 @@ export function adminRoutes(deps: AdminRoutesDeps) {
       }
       throw err;
     }
+  });
+
+  // GET /api/admin/stats — dashboard statistics
+  app.get('/stats', async (c) => {
+    logger.debug('GET /api/admin/stats');
+
+    const stats = await getAdminStats.execute();
+
+    logger.info('Admin stats fetched', { totalUsers: stats.totalUsers });
+    return c.json({ data: { stats } });
+  });
+
+  // GET /api/admin/activity-logs — paginated activity logs
+  app.get('/activity-logs', zValidator('query', activityLogsQuerySchema), async (c) => {
+    const { limit, offset, userId, action } = c.req.valid('query');
+    logger.debug('GET /api/admin/activity-logs', { limit, offset, userId, action });
+
+    const result = await getActivityLogs.execute({
+      filters: { userId, action },
+      limit,
+      offset,
+    });
+
+    logger.info('Activity logs fetched', { count: result.logs.length, total: result.total });
+    return c.json({
+      data: {
+        logs: result.logs.map((log) => ({
+          ...log,
+          createdAt: log.createdAt?.toISOString(),
+        })),
+        total: result.total,
+      },
+    });
   });
 
   return app;

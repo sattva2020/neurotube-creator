@@ -1,4 +1,4 @@
-import { eq, desc, and } from 'drizzle-orm';
+import { eq, desc, and, count as sqlCount } from 'drizzle-orm';
 import type { IPlanRepository } from '../../domain/ports/IPlanRepository.js';
 import type { VideoPlan } from '../../domain/entities/VideoPlan.js';
 import type { Niche } from '../../domain/entities/Niche.js';
@@ -88,6 +88,20 @@ export class PlanRepository implements IPlanRepository {
 
     const elapsed = Date.now() - start;
     logger.info('delete() completed', { id, userId, elapsed });
+  }
+
+  async countAll(): Promise<number> {
+    const start = Date.now();
+    logger.debug('countAll() called');
+
+    const [row] = await this.db
+      .select({ value: sqlCount() })
+      .from(plans);
+
+    const total = Number(row.value);
+    const elapsed = Date.now() - start;
+    logger.info('countAll() completed', { total, elapsed });
+    return total;
   }
 
   private toEntity(row: typeof plans.$inferSelect): VideoPlan {

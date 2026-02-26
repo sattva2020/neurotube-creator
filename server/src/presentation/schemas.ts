@@ -139,3 +139,11 @@ export const updateUserRoleSchema = z.object({
 export const listUsersQuerySchema = z.object({
   role: roleSchema.optional(),
 });
+
+/** GET /api/admin/activity-logs?limit=50&offset=0&userId=x&action=x */
+export const activityLogsQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(100).optional().default(50),
+  offset: z.coerce.number().int().min(0).optional().default(0),
+  userId: z.string().uuid().optional(),
+  action: z.string().optional(),
+});

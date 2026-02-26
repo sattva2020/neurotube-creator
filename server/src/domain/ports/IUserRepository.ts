@@ -26,4 +26,13 @@ export interface IUserRepository {
 
   /** Count total users (for first-user-owner check) */
   count(): Promise<number>;
+
+  /** Count active users (admin stats) */
+  countActive(): Promise<number>;
+
+  /** Count users by role (admin stats) */
+  countByRole(): Promise<Record<string, number>>;
+
+  /** Count users registered since a given date (admin stats) */
+  countSince(since: Date): Promise<number>;
 }

@@ -222,6 +222,50 @@ export const MOCK_ADMIN_USERS = {
   total: 4,
 };
 
+// --- Admin Dashboard mock data ---
+
+export const MOCK_ADMIN_STATS = {
+  totalUsers: 4,
+  activeUsers: 3,
+  totalIdeas: 25,
+  totalPlans: 10,
+  recentRegistrations: 2,
+  roleDistribution: { owner: 1, admin: 1, editor: 1, viewer: 1 },
+};
+
+export const MOCK_ACTIVITY_LOGS = {
+  logs: [
+    {
+      id: 'log-001',
+      userId: 'admin-001',
+      action: 'user.role_updated',
+      resourceType: 'user',
+      resourceId: 'user-001',
+      metadata: { newRole: 'editor' },
+      ipAddress: '127.0.0.1',
+      createdAt: '2026-02-26T12:00:00Z',
+    },
+    {
+      id: 'log-002',
+      userId: 'user-001',
+      action: 'user.login',
+      resourceType: 'user',
+      resourceId: 'user-001',
+      ipAddress: '192.168.1.1',
+      createdAt: '2026-02-26T11:00:00Z',
+    },
+    {
+      id: 'log-003',
+      userId: 'user-002',
+      action: 'user.registered',
+      resourceType: 'user',
+      resourceId: 'user-002',
+      createdAt: '2026-02-26T10:00:00Z',
+    },
+  ],
+  total: 3,
+};
+
 console.debug('[test-data] Mock data loaded:', {
   ideas: MOCK_IDEAS.length,
   planId: MOCK_PLAN.id,

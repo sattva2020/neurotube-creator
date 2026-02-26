@@ -31,6 +31,8 @@ import {
   mockAuthLogout,
   mockAuthMe,
   mockAdminUsers,
+  mockAdminStats,
+  mockAdminActivityLogs,
   injectAuthTokens,
 } from '../helpers/api-mock';
 
@@ -69,6 +71,8 @@ type TestFixtures = {
     authLogout: typeof mockAuthLogout;
     authMe: typeof mockAuthMe;
     adminUsers: typeof mockAdminUsers;
+    adminStats: typeof mockAdminStats;
+    adminActivityLogs: typeof mockAdminActivityLogs;
   };
 };
 
@@ -155,6 +159,8 @@ export const test = base.extend<TestFixtures>({
       authLogout: (p?) => mockAuthLogout(p ?? page),
       authMe: (p, user?) => mockAuthMe(p ?? page, user),
       adminUsers: (p, users?) => mockAdminUsers(p ?? page, users),
+      adminStats: (p, stats?) => mockAdminStats(p ?? page, stats),
+      adminActivityLogs: (p, logs?) => mockAdminActivityLogs(p ?? page, logs),
     });
   },
 });

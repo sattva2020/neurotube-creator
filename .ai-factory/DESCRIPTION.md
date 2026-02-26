@@ -21,6 +21,8 @@ AI-powered YouTube idea generator and script outliner for psychology/neuroscienc
 - **Authentication:** User registration/login with JWT access tokens (15m, HS256 via jose) + refresh token rotation (7d, opaque UUID), bcrypt password hashing, auth middleware, session management
 - **Role-Based Access:** 4-tier hierarchy (Owner → Admin → Editor → Viewer) with `requireRole` middleware, global auth guard on /api/*, admin user management (list/update role/deactivate), first-user-as-owner auto-assignment
 - **Auth Frontend:** Login/Register pages, auth store with JWT token management, route guards (requiresAuth, requiresRole, guest), 401 auto-refresh, admin user management page, user info in toolbar
+- **Admin Panel:** Tabbed admin dashboard with stats (users, ideas, plans, registrations), role distribution visualization, user management table (role editing, deactivation), paginated activity log with action filters
+- **Activity Logging:** Audit trail for admin and auth actions (role changes, deactivation, registration, login) with IP tracking and metadata
 
 ## Tech Stack
 

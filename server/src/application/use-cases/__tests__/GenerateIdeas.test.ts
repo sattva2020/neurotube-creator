@@ -44,6 +44,7 @@ describe('GenerateIdeas', () => {
       findAll: vi.fn(),
       findById: vi.fn(),
       delete: vi.fn(),
+      countAll: vi.fn().mockResolvedValue(0),
     };
 
     useCase = new GenerateIdeas(aiService, ideaRepo);
