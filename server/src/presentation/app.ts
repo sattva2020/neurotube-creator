@@ -1,5 +1,8 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
+import { serveStatic } from '@hono/node-server/serve-static';
 import { health } from './routes/health.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { requestLogger } from './middleware/requestLogger.js';
@@ -75,6 +78,27 @@ export function createApp(deps: AppDeps) {
   app.route('/api/roadmap', roadmapRoutes(deps.generateRoadmap));
   app.route('/api/suno', sunoRoutes(deps.generateSunoPrompt));
 
+  // --- Static file serving (SPA) ---
+  const staticDir = process.env.STATIC_DIR || path.join(__dirname, '../../client/dist');
+  const staticDirResolved = path.resolve(staticDir);
+
+  if (fs.existsSync(staticDirResolved)) {
+    logger.info('Serving static files', { path: staticDirResolved });
+
+    // Serve static assets from client build
+    app.use('*', serveStatic({
+      root: path.relative(process.cwd(), staticDirResolved),
+    }));
+
+    // SPA fallback: non-API routes → index.html
+    app.use('*', serveStatic({
+      root: path.relative(process.cwd(), staticDirResolved),
+      rewriteRequestPath: () => '/index.html',
+    }));
+  } else {
+    logger.warn('Static files directory not found, skipping SPA serving', { path: staticDirResolved });
+  }
+
   // --- Error handling ---
   app.notFound(notFound);
   app.onError(errorHandler);
@@ -85,6 +109,7 @@ export function createApp(deps: AppDeps) {
       '/api/titles', '/api/descriptions', '/api/branding', '/api/analysis',
       '/api/notebooklm', '/api/shorts', '/api/monetization', '/api/roadmap', '/api/suno',
     ],
+    staticDir: fs.existsSync(staticDirResolved) ? staticDirResolved : 'NOT FOUND',
   });
 
   return app;
