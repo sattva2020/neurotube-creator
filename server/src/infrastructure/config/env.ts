@@ -10,6 +10,8 @@ const envSchema = z.object({
   LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   STATIC_DIR: z.string().optional(),
+  POSTHOG_API_KEY: z.string().optional().default(''),
+  POSTHOG_HOST: z.string().optional().default('https://us.i.posthog.com'),
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -32,6 +34,8 @@ function loadEnv(): Env {
     STATIC_DIR: result.data.STATIC_DIR || '(auto)',
     DATABASE_URL: '***',
     GEMINI_API_KEY: '***',
+    POSTHOG_API_KEY: result.data.POSTHOG_API_KEY ? '***' : '(disabled)',
+    POSTHOG_HOST: result.data.POSTHOG_HOST,
   });
 
   return result.data;

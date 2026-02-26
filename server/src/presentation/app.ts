@@ -6,6 +6,7 @@ import { serveStatic } from '@hono/node-server/serve-static';
 import { health } from './routes/health.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { requestLogger } from './middleware/requestLogger.js';
+import { createAnalyticsMiddleware } from './middleware/analyticsMiddleware.js';
 import { notFound } from './middleware/notFound.js';
 import { createLogger } from '../infrastructure/logger.js';
 import type { GenerateIdeas } from '../application/use-cases/GenerateIdeas.js';
@@ -22,6 +23,7 @@ import type { GenerateRoadmap } from '../application/use-cases/GenerateRoadmap.j
 import type { GenerateSunoPrompt } from '../application/use-cases/GenerateSunoPrompt.js';
 import type { IIdeaRepository } from '../domain/ports/IIdeaRepository.js';
 import type { IPlanRepository } from '../domain/ports/IPlanRepository.js';
+import type { PostHogService } from '../infrastructure/analytics/index.js';
 import { ideasRoutes } from './routes/ideas.js';
 import { plansRoutes } from './routes/plans.js';
 import { thumbnailsRoutes } from './routes/thumbnails.js';
@@ -52,6 +54,7 @@ export interface AppDeps {
   generateSunoPrompt: GenerateSunoPrompt;
   ideaRepo: IIdeaRepository;
   planRepo: IPlanRepository;
+  analytics: PostHogService;
 }
 
 export function createApp(deps: AppDeps) {
@@ -61,6 +64,7 @@ export function createApp(deps: AppDeps) {
 
   // --- Middleware ---
   app.use('*', requestLogger);
+  app.use('/api/*', createAnalyticsMiddleware(deps.analytics));
   app.use('*', cors());
 
   // --- Routes ---

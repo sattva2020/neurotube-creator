@@ -79,6 +79,7 @@ import { usePlanStore } from '@/stores/plan';
 import { useIdeasStore } from '@/stores/ideas';
 import { useGeneratePlan } from '@/composables/useGeneratePlan';
 import { usePlansHistory } from '@/composables/usePlansHistory';
+import { useAnalytics } from '@/composables/useAnalytics';
 
 const md = new MarkdownIt({ html: false, linkify: true, typographer: true });
 
@@ -88,6 +89,8 @@ const planStore = usePlanStore();
 const ideasStore = useIdeasStore();
 const { generate } = useGeneratePlan();
 const { fetchById } = usePlansHistory();
+
+const { trackEvent } = useAnalytics();
 
 const error = ref('');
 const loadingById = ref(false);
@@ -110,6 +113,7 @@ async function loadPlanById(id: string) {
     const plan = await fetchById(id);
     if (plan) {
       planStore.setPlan(plan);
+      trackEvent('plan_viewed', { id, title: plan.title });
       console.debug('[PlanPage] Plan loaded from DB:', plan.title);
     } else {
       error.value = 'План не найден.';

@@ -28,12 +28,14 @@ AI-powered YouTube idea generator and script outliner for psychology/neuroscienc
 - **Routing:** Vue Router (via Quasar)
 - **UI Components:** Quasar Material Design components
 - **Icons:** Quasar icons (Material Icons)
+- **Analytics:** PostHog (`posthog-js`) — opt-in client-side event tracking and auto-pageviews
 
 ### Backend
 - **Runtime:** Node.js
 - **Framework:** Hono (TypeScript-first, lightweight)
 - **Validation:** Zod
 - **AI Provider:** Google Gemini API (`@google/genai`) — gemini-3-flash-preview (text), gemini-3-pro-image-preview (images)
+- **Analytics:** PostHog (`posthog-node`) — opt-in server-side event tracking and API metrics
 
 ### Database
 - **Database:** PostgreSQL

@@ -19,7 +19,7 @@
 - [x] **Documentation Update** — обновить docs/ под fullstack архитектуру, README.md, getting-started
 - [x] **Legacy Cleanup & Polish** — удалить src/ (React), обновить CI/CD, финальное тестирование, production readiness
 - [x] **E2E Testing (Playwright)** — настройка Playwright, тесты ключевых флоу: генерация идей, просмотр плана, AI-инструменты, persistence
-- [ ] **Usage Analytics & Monitoring** — интеграция аналитики (Plausible/PostHog), трекинг действий пользователя, API-метрики, дашборд мониторинга
+- [x] **Usage Analytics & Monitoring** — интеграция аналитики (Plausible/PostHog), трекинг действий пользователя, API-метрики, дашборд мониторинга
 
 ## Completed
 
@@ -40,3 +40,4 @@
 | State Management & Data Persistence | 2026-02-25 |
 | Docker & Dokploy Deployment | 2026-02-26 |
 | E2E Testing (Playwright) | 2026-02-26 |
+| Usage Analytics & Monitoring | 2026-02-26 |

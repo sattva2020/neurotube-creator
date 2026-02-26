@@ -15,9 +15,11 @@ import { onMounted } from 'vue';
 import type { Niche } from '@neurotube/shared';
 import { useNicheStore } from '@/stores/niche';
 import { useIdeasStore } from '@/stores/ideas';
+import { useAnalytics } from '@/composables/useAnalytics';
 
 const nicheStore = useNicheStore();
 const ideasStore = useIdeasStore();
+const { trackEvent } = useAnalytics();
 
 const options = [
   { label: 'Психология', value: 'psychology' as Niche, icon: 'psychology' },
@@ -26,6 +28,7 @@ const options = [
 
 function onToggle(value: Niche) {
   console.debug('[NicheToggle] Switched to:', value);
+  trackEvent('niche_toggled', { niche: value });
   ideasStore.clear();
 }
 

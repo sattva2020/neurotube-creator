@@ -50,6 +50,7 @@
 import { reactive, computed, onMounted } from 'vue';
 import { useToolResultsStore } from '@/stores/toolResults';
 import type { ToolKey } from '@/stores/toolResults';
+import { useAnalytics } from '@/composables/useAnalytics';
 import MarkdownResult from './MarkdownResult.vue';
 
 export interface MarkdownToolField {
@@ -75,6 +76,7 @@ const props = defineProps<{
 const dialogOpen = defineModel<boolean>({ required: true });
 
 const toolStore = useToolResultsStore();
+const { trackEvent } = useAnalytics();
 
 const inputs = reactive<Record<string, string>>({});
 
@@ -97,6 +99,7 @@ async function onGenerate() {
   console.debug(`[MarkdownToolDialog:${props.config.toolKey}] Generate clicked`, args);
   try {
     await props.config.generateFn(...args);
+    trackEvent('tool_completed', { tool: props.config.toolKey });
   } catch {
     // error is stored in toolStore.errors[toolKey]
   }

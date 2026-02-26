@@ -65,9 +65,11 @@ import { useAnalyzeNiche } from '@/composables/useAnalyzeNiche';
 import { useGenerateMonetization } from '@/composables/useGenerateMonetization';
 import { useGenerateRoadmap } from '@/composables/useGenerateRoadmap';
 import { useGenerateSuno } from '@/composables/useGenerateSuno';
+import { useAnalytics } from '@/composables/useAnalytics';
 
 const router = useRouter();
 const toolStore = useToolResultsStore();
+const { trackEvent } = useAnalytics();
 
 // Composable instances for markdown tools
 const descriptionComposable = useGenerateDescription();
@@ -191,6 +193,7 @@ const dialogs = reactive<Record<ToolKey, boolean>>({
 
 function openDialog(key: ToolKey) {
   console.debug('[ToolsPage] Opening dialog:', key);
+  trackEvent('tool_opened', { tool: key });
   dialogs[key] = true;
 }
 

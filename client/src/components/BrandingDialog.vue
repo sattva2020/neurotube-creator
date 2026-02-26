@@ -143,11 +143,13 @@ import { copyToClipboard } from 'quasar';
 import type { ChannelBranding } from '@neurotube/shared';
 import { useToolResultsStore } from '@/stores/toolResults';
 import { useGenerateBranding } from '@/composables/useGenerateBranding';
+import { useAnalytics } from '@/composables/useAnalytics';
 
 const dialogOpen = defineModel<boolean>({ required: true });
 
 const toolStore = useToolResultsStore();
 const { generate } = useGenerateBranding();
+const { trackEvent } = useAnalytics();
 
 const videoTitle = ref('');
 const niche = ref('psychology');
@@ -169,6 +171,7 @@ async function onGenerate() {
   console.debug('[BrandingDialog] Generate clicked', { videoTitle: videoTitle.value, niche: niche.value });
   try {
     await generate(videoTitle.value, niche.value);
+    trackEvent('tool_completed', { tool: 'branding' });
   } catch {
     // error is stored in toolStore.errors.branding
   }

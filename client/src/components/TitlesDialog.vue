@@ -67,11 +67,13 @@ import { ref, computed, onMounted } from 'vue';
 import { copyToClipboard } from 'quasar';
 import { useToolResultsStore } from '@/stores/toolResults';
 import { useGenerateTitles } from '@/composables/useGenerateTitles';
+import { useAnalytics } from '@/composables/useAnalytics';
 
 const dialogOpen = defineModel<boolean>({ required: true });
 
 const toolStore = useToolResultsStore();
 const { generate } = useGenerateTitles();
+const { trackEvent } = useAnalytics();
 
 const titleIdea = ref('');
 
@@ -84,6 +86,7 @@ async function onGenerate() {
   console.debug('[TitlesDialog] Generate clicked', { titleIdea: titleIdea.value });
   try {
     await generate(titleIdea.value);
+    trackEvent('tool_completed', { tool: 'titles' });
   } catch {
     // error is stored in toolStore.errors.titles
   }

@@ -1,12 +1,14 @@
 import { useApi, ApiRequestError } from './useApi';
 import { usePlanStore } from '@/stores/plan';
 import { useIdeasStore } from '@/stores/ideas';
+import { useAnalytics } from './useAnalytics';
 import type { VideoPlan } from '@neurotube/shared';
 
 export function useGeneratePlan() {
   const { post } = useApi();
   const planStore = usePlanStore();
   const ideasStore = useIdeasStore();
+  const { trackEvent } = useAnalytics();
 
   async function generate() {
     const idea = ideasStore.selected;
@@ -30,6 +32,7 @@ export function useGeneratePlan() {
         { title: idea.title, hook: idea.hook, niche: idea.niche },
       );
       console.debug('[useGeneratePlan] Received plan', { id: plan.id, title: plan.title, length: plan.markdown.length });
+      trackEvent('plan_generated', { title: idea.title, niche: idea.niche, length: plan.markdown.length });
       planStore.setPlan(plan);
     } catch (error) {
       if (error instanceof ApiRequestError) {

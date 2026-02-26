@@ -153,6 +153,7 @@ import { useNicheStore } from '@/stores/niche';
 import { useIdeasStore } from '@/stores/ideas';
 import { useGenerateIdeas } from '@/composables/useGenerateIdeas';
 import { useIdeasHistory } from '@/composables/useIdeasHistory';
+import { useAnalytics } from '@/composables/useAnalytics';
 import NicheToggle from '@/components/NicheToggle.vue';
 import IdeaCard from '@/components/IdeaCard.vue';
 
@@ -187,6 +188,8 @@ const {
   remove: removeIdea,
 } = useIdeasHistory();
 
+const { trackEvent } = useAnalytics();
+
 const topic = ref('');
 const error = ref('');
 
@@ -194,6 +197,7 @@ const currentPresets = computed(() => PRESETS[nicheStore.active] ?? []);
 
 async function onSubmit() {
   console.debug('[IndexPage] Submit topic:', topic.value);
+  trackEvent('search_submitted', { topic: topic.value, niche: nicheStore.active });
   error.value = '';
   try {
     await generate(topic.value);
@@ -205,6 +209,7 @@ async function onSubmit() {
 
 function onSelectIdea(idea: VideoIdea) {
   console.debug('[IndexPage] Idea selected:', idea.title);
+  trackEvent('idea_selected', { title: idea.title, niche: idea.niche });
   ideasStore.selectIdea(idea);
 }
 
@@ -216,6 +221,7 @@ function onGeneratePlan(idea: VideoIdea) {
 
 async function onDeleteIdea(id: string) {
   console.debug('[IndexPage] Delete idea:', id);
+  trackEvent('idea_deleted', { id });
   try {
     await removeIdea(id);
   } catch {

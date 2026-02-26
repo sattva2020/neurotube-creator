@@ -18,6 +18,7 @@ import { GenerateShorts } from './application/use-cases/GenerateShorts.js';
 import { GenerateMonetization } from './application/use-cases/GenerateMonetization.js';
 import { GenerateRoadmap } from './application/use-cases/GenerateRoadmap.js';
 import { GenerateSunoPrompt } from './application/use-cases/GenerateSunoPrompt.js';
+import { PostHogService } from './infrastructure/analytics/index.js';
 import { createApp } from './presentation/app.js';
 
 const logger = createLogger('Server');
@@ -29,6 +30,7 @@ const { db, sql } = createDbClient(env.DATABASE_URL);
 const aiService = new GeminiAiService(env.GEMINI_API_KEY);
 const ideaRepo = new IdeaRepository(db);
 const planRepo = new PlanRepository(db);
+const analytics = new PostHogService(env.POSTHOG_API_KEY, env.POSTHOG_HOST);
 
 // --- Use cases ---
 logger.debug('Wiring application use cases');
@@ -62,6 +64,7 @@ const app = createApp({
   generateSunoPrompt,
   ideaRepo,
   planRepo,
+  analytics,
 });
 
 // --- Start server ---
@@ -73,6 +76,7 @@ const server = serve({ fetch: app.fetch, port: env.PORT }, () => {
 async function shutdown(signal: string) {
   logger.info(`Received ${signal}, shutting down gracefully`);
   server.close();
+  await analytics.shutdown();
   await sql.end();
   logger.info('Server shut down complete');
   process.exit(0);

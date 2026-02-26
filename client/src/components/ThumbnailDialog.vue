@@ -65,11 +65,13 @@
 import { ref, computed, onMounted } from 'vue';
 import { useToolResultsStore } from '@/stores/toolResults';
 import { useGenerateThumbnail } from '@/composables/useGenerateThumbnail';
+import { useAnalytics } from '@/composables/useAnalytics';
 
 const dialogOpen = defineModel<boolean>({ required: true });
 
 const toolStore = useToolResultsStore();
 const { generate } = useGenerateThumbnail();
+const { trackEvent } = useAnalytics();
 
 const prompt = ref('');
 
@@ -85,6 +87,7 @@ async function onGenerate() {
   console.debug('[ThumbnailDialog] Generate clicked', { prompt: prompt.value });
   try {
     await generate(prompt.value);
+    trackEvent('tool_completed', { tool: 'thumbnail' });
   } catch {
     // error is stored in toolStore.errors.thumbnail
   }

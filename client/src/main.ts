@@ -7,6 +7,7 @@ import 'quasar/src/css/index.sass';
 
 import App from './App.vue';
 import { router } from './router';
+import { posthogPlugin } from './plugins/posthog';
 
 console.debug('[main] Initializing NeuroTube Creator app');
 
@@ -22,6 +23,13 @@ app.use(Quasar, {
   plugins: {},
 });
 console.debug('[main] Quasar framework installed');
+
+app.use(posthogPlugin, {
+  apiKey: import.meta.env.VITE_POSTHOG_API_KEY || '',
+  host: import.meta.env.VITE_POSTHOG_HOST || 'https://us.i.posthog.com',
+  router,
+});
+console.debug('[main] PostHog analytics plugin installed');
 
 app.mount('#app');
 console.debug('[main] App mounted to #app');
