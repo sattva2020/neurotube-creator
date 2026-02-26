@@ -1,4 +1,4 @@
-FROM node:22-slim AS builder
+FROM node:22-slim
 WORKDIR /app
 
 # Install all dependencies
@@ -22,33 +22,12 @@ RUN npm run build:server
 COPY client/ ./client/
 RUN npm run build:client
 
-# Prune dev dependencies in-place
-RUN npm prune --omit=dev
-
-# ---- Production ----
-FROM node:22-slim
-WORKDIR /app
-
-ENV NODE_ENV=production
-ENV PORT=3000
-
-# Copy package manifests (needed for workspace resolution)
-COPY package.json ./
-COPY server/package.json ./server/
-COPY shared/package.json ./shared/
-
-# Copy pruned node_modules from builder (avoids second npm ci)
-COPY --from=builder /app/node_modules/ ./node_modules/
-COPY --from=builder /app/server/node_modules/ ./server/node_modules/
-
-# Copy built artifacts
-COPY --from=builder /app/server/dist/ ./server/dist/
-COPY --from=builder /app/client/dist/ ./client/dist/
-COPY --from=builder /app/shared/dist/ ./shared/dist/
-
 # Copy Drizzle migrations and config
 COPY server/drizzle/ ./server/drizzle/
 COPY server/drizzle.config.ts ./server/
 
+ENV NODE_ENV=production
+ENV PORT=3000
 EXPOSE 3000
+
 CMD ["node", "server/dist/index.js"]
