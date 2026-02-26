@@ -3,6 +3,7 @@ node_modules/
 
 # Build outputs (rebuilt inside Docker)
 **/dist/
+*.tsbuildinfo
 
 # Git
 .git/

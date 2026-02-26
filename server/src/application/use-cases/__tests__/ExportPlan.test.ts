@@ -3,7 +3,7 @@ import { ExportPlan } from '../ExportPlan.js';
 import type { IPlanRepository } from '../../../domain/ports/IPlanRepository.js';
 import type { IDocumentExporter } from '../../../domain/ports/IDocumentExporter.js';
 import type { VideoPlan } from '../../../domain/entities/VideoPlan.js';
-import type { ExportResult } from '@neurotube/shared/export';
+import type { ExportResult } from '../../../../../shared/types/export.js';
 
 describe('ExportPlan', () => {
   let planRepo: IPlanRepository;

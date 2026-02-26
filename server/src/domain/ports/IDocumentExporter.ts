@@ -1,4 +1,4 @@
-import type { ExportFormat, ExportResult } from '@neurotube/shared/export';
+import type { ExportFormat, ExportResult } from '../../../../shared/types/export.js';
 
 /** Port for exporting documents to different file formats */
 export interface IDocumentExporter {
