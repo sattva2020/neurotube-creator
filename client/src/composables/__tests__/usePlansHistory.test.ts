@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { setActivePinia, createPinia } from 'pinia';
 import { usePlansHistory } from '../usePlansHistory';
 import type { VideoPlan } from '@neurotube/shared';
 
@@ -25,6 +26,7 @@ function jsonResponse(data: unknown, status = 200) {
 describe('usePlansHistory', () => {
   beforeEach(() => {
     mockFetch.mockReset();
+    setActivePinia(createPinia());
   });
 
   it('fetchAll loads plans into history', async () => {

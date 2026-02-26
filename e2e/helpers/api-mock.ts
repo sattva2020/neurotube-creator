@@ -11,6 +11,9 @@ import {
   MOCK_BRANDING,
   MOCK_SHORTS,
   MOCK_TOOL_MARKDOWN,
+  MOCK_AUTH_RESPONSE,
+  MOCK_AUTH_USER,
+  MOCK_ADMIN_USERS,
 } from './test-data';
 
 const DEBUG = process.env.E2E_DEBUG === 'true';
@@ -230,6 +233,104 @@ export async function mockApiError(
       }),
     });
   });
+}
+
+/** Mock POST /api/auth/login — returns mock auth response */
+export async function mockAuthLogin(page: Page, authResponse = MOCK_AUTH_RESPONSE) {
+  log('Setting up mock: POST /api/auth/login');
+  await page.route('**/api/auth/login', async (route) => {
+    if (route.request().method() === 'POST') {
+      log('Intercepted POST /api/auth/login');
+      await fulfillJson(route, authResponse);
+    } else {
+      await route.continue();
+    }
+  });
+}
+
+/** Mock POST /api/auth/register — returns mock auth response */
+export async function mockAuthRegister(page: Page, authResponse = MOCK_AUTH_RESPONSE) {
+  log('Setting up mock: POST /api/auth/register');
+  await page.route('**/api/auth/register', async (route) => {
+    if (route.request().method() === 'POST') {
+      log('Intercepted POST /api/auth/register');
+      await fulfillJson(route, authResponse);
+    } else {
+      await route.continue();
+    }
+  });
+}
+
+/** Mock POST /api/auth/refresh — returns mock auth response */
+export async function mockAuthRefresh(page: Page, authResponse = MOCK_AUTH_RESPONSE) {
+  log('Setting up mock: POST /api/auth/refresh');
+  await page.route('**/api/auth/refresh', async (route) => {
+    if (route.request().method() === 'POST') {
+      log('Intercepted POST /api/auth/refresh');
+      await fulfillJson(route, authResponse);
+    } else {
+      await route.continue();
+    }
+  });
+}
+
+/** Mock POST /api/auth/logout — returns success */
+export async function mockAuthLogout(page: Page) {
+  log('Setting up mock: POST /api/auth/logout');
+  await page.route('**/api/auth/logout', async (route) => {
+    if (route.request().method() === 'POST') {
+      log('Intercepted POST /api/auth/logout');
+      await fulfillJson(route, null);
+    } else {
+      await route.continue();
+    }
+  });
+}
+
+/** Mock GET /api/auth/me — returns mock user */
+export async function mockAuthMe(page: Page, user = MOCK_AUTH_USER) {
+  log('Setting up mock: GET /api/auth/me');
+  await page.route('**/api/auth/me', async (route) => {
+    if (route.request().method() === 'GET') {
+      log('Intercepted GET /api/auth/me');
+      await fulfillJson(route, user);
+    } else {
+      await route.continue();
+    }
+  });
+}
+
+/** Mock GET /api/admin/users — returns mock admin users list */
+export async function mockAdminUsers(page: Page, adminUsers = MOCK_ADMIN_USERS) {
+  log('Setting up mock: GET /api/admin/users');
+  await page.route('**/api/admin/users', async (route) => {
+    if (route.request().method() === 'GET') {
+      log('Intercepted GET /api/admin/users');
+      await fulfillJson(route, adminUsers);
+    } else {
+      await route.continue();
+    }
+  });
+}
+
+/** Set up all auth API mocks */
+export async function mockAllAuthRoutes(page: Page) {
+  log('Setting up all auth API mocks');
+  await mockAuthLogin(page);
+  await mockAuthRegister(page);
+  await mockAuthRefresh(page);
+  await mockAuthLogout(page);
+  await mockAuthMe(page);
+  await mockAdminUsers(page);
+}
+
+/** Inject auth tokens into localStorage so the app starts authenticated */
+export async function injectAuthTokens(page: Page, authResponse = MOCK_AUTH_RESPONSE) {
+  log('Injecting auth tokens into localStorage');
+  await page.addInitScript((response) => {
+    localStorage.setItem('neurotube-auth-tokens', JSON.stringify(response.tokens));
+    localStorage.setItem('neurotube-auth-user', JSON.stringify(response.user));
+  }, authResponse);
 }
 
 /** Set up all common API mocks at once */

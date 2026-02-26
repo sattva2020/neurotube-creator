@@ -35,9 +35,13 @@ neurotube-creator/
 │   ├── src/
 │   │   ├── pages/                   # Route pages
 │   │   │   ├── IndexPage.vue        # Home — niche toggle, search, idea list
-│   │   │   └── PlanPage.vue         # Video plan viewer with all AI tools
+│   │   │   ├── PlanPage.vue         # Video plan viewer with all AI tools
+│   │   │   ├── LoginPage.vue        # Login form (email + password)
+│   │   │   ├── RegisterPage.vue     # Registration form (name + email + password)
+│   │   │   └── AdminPage.vue        # Admin user management (q-table)
 │   │   ├── layouts/
-│   │   │   └── MainLayout.vue       # App shell — header, sidebar, footer
+│   │   │   ├── MainLayout.vue       # App shell — header, sidebar, footer, user info
+│   │   │   └── AuthLayout.vue       # Minimal layout for login/register (no sidebar)
 │   │   ├── components/              # Reusable UI components
 │   │   │   ├── IdeaCard.vue         # Single video idea card
 │   │   │   ├── NicheToggle.vue      # Psychology/Ambient switcher
@@ -55,11 +59,13 @@ neurotube-creator/
 │   │   ├── stores/                  # Pinia state management
 │   │   │   ├── ideas.ts             # Generated ideas store
 │   │   │   ├── plan.ts              # Current plan store
-│   │   │   └── niche.ts             # Active niche store
+│   │   │   ├── niche.ts             # Active niche store
+│   │   │   └── auth.ts              # Auth store — JWT tokens, user, login/register/logout
 │   │   ├── types/                   # Shared TypeScript types
 │   │   │   └── index.ts             # VideoIdea, Niche, ChannelBranding
 │   │   ├── router/
-│   │   │   └── routes.ts            # Vue Router routes
+│   │   │   ├── routes.ts            # Vue Router routes (auth routes, meta fields)
+│   │   │   └── index.ts             # Router with navigation guards (auth, role checks)
 │   │   └── assets/                  # Static assets, icons
 │   ├── quasar.config.ts             # Quasar framework config
 │   ├── tsconfig.json

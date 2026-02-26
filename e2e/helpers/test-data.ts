@@ -176,8 +176,55 @@ export const MOCK_SHORTS = [
 
 export const MOCK_TOOL_MARKDOWN = '# Generated Content\n\nThis is a mock tool response with **markdown** formatting.\n\n- Point 1\n- Point 2\n- Point 3\n';
 
+// --- Auth mock data ---
+
+export const MOCK_AUTH_USER = {
+  id: 'user-001',
+  email: 'test@example.com',
+  displayName: 'Test User',
+  role: 'editor' as const,
+  isActive: true,
+  createdAt: '2026-02-26T10:00:00Z',
+};
+
+export const MOCK_AUTH_ADMIN = {
+  id: 'admin-001',
+  email: 'admin@example.com',
+  displayName: 'Admin User',
+  role: 'admin' as const,
+  isActive: true,
+  createdAt: '2026-02-25T10:00:00Z',
+};
+
+export const MOCK_AUTH_RESPONSE = {
+  user: MOCK_AUTH_USER,
+  tokens: {
+    accessToken: 'mock-access-token-123',
+    refreshToken: 'mock-refresh-token-456',
+  },
+};
+
+export const MOCK_AUTH_ADMIN_RESPONSE = {
+  user: MOCK_AUTH_ADMIN,
+  tokens: {
+    accessToken: 'mock-admin-access-token',
+    refreshToken: 'mock-admin-refresh-token',
+  },
+};
+
+export const MOCK_ADMIN_USERS = {
+  users: [
+    { id: 'owner-001', email: 'owner@example.com', displayName: 'Owner', role: 'owner', isActive: true, createdAt: '2026-01-01T00:00:00Z' },
+    MOCK_AUTH_ADMIN,
+    MOCK_AUTH_USER,
+    { id: 'user-002', email: 'viewer@example.com', displayName: 'Viewer User', role: 'viewer', isActive: true, createdAt: '2026-02-27T00:00:00Z' },
+  ],
+  total: 4,
+};
+
 console.debug('[test-data] Mock data loaded:', {
   ideas: MOCK_IDEAS.length,
   planId: MOCK_PLAN.id,
   titles: MOCK_TITLES.length,
+  authUser: MOCK_AUTH_USER.email,
 });

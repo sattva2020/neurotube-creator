@@ -21,6 +21,35 @@
 
         <!-- Niche toggle area — populated by pages -->
         <slot name="toolbar-right" />
+
+        <!-- User info -->
+        <template v-if="authStore.isAuthenticated && authStore.user">
+          <q-chip
+            color="white"
+            text-color="primary"
+            dense
+            class="q-ml-sm"
+          >
+            {{ authStore.user.displayName }}
+            <q-badge
+              :label="authStore.user.role"
+              color="secondary"
+              class="q-ml-xs"
+            />
+          </q-chip>
+
+          <q-btn
+            flat
+            dense
+            round
+            icon="logout"
+            aria-label="Выйти"
+            class="q-ml-xs"
+            @click="onLogout"
+          >
+            <q-tooltip>Выйти</q-tooltip>
+          </q-btn>
+        </template>
       </q-toolbar>
     </q-header>
 
@@ -47,6 +76,13 @@
           </q-item-section>
           <q-item-section>AI-инструменты</q-item-section>
         </q-item>
+
+        <q-item v-if="authStore.isAdmin" clickable to="/admin">
+          <q-item-section avatar>
+            <q-icon name="admin_panel_settings" />
+          </q-item-section>
+          <q-item-section>Управление</q-item-section>
+        </q-item>
       </q-list>
     </q-drawer>
 
@@ -58,7 +94,11 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 
+const router = useRouter();
+const authStore = useAuthStore();
 const drawerOpen = ref(false);
 
 function toggleDrawer() {
@@ -66,7 +106,14 @@ function toggleDrawer() {
   console.debug('[MainLayout] Drawer toggled:', drawerOpen.value);
 }
 
+async function onLogout(): Promise<void> {
+  console.debug('[MainLayout] Logout clicked');
+  await authStore.logout();
+  await router.push('/login');
+  console.debug('[MainLayout] Logged out, redirected to /login');
+}
+
 onMounted(() => {
-  console.debug('[MainLayout] Layout mounted');
+  console.debug('[MainLayout] Layout mounted, user:', authStore.user?.email ?? 'none');
 });
 </script>

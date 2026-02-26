@@ -20,6 +20,7 @@ AI-powered YouTube idea generator and script outliner for psychology/neuroscienc
 - **Data Persistence:** Save and browse generated ideas and plans (PostgreSQL)
 - **Authentication:** User registration/login with JWT access tokens (15m, HS256 via jose) + refresh token rotation (7d, opaque UUID), bcrypt password hashing, auth middleware, session management
 - **Role-Based Access:** 4-tier hierarchy (Owner → Admin → Editor → Viewer) with `requireRole` middleware, global auth guard on /api/*, admin user management (list/update role/deactivate), first-user-as-owner auto-assignment
+- **Auth Frontend:** Login/Register pages, auth store with JWT token management, route guards (requiresAuth, requiresRole, guest), 401 auto-refresh, admin user management page, user info in toolbar
 
 ## Tech Stack
 
