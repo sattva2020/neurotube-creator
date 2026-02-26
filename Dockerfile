@@ -22,10 +22,33 @@ RUN npm run build:server
 COPY client/ ./client/
 RUN npm run build:client
 
-# Test: simple server to prove all builds passed
-FROM node:22-slim
+# ---- Production ----
+FROM node:22-slim AS production
 WORKDIR /app
-RUN echo '{"type":"module"}' > package.json && \
-    echo 'import http from "http"; const s = http.createServer((req, res) => { res.writeHead(200, {"Content-Type":"application/json"}); res.end(JSON.stringify({status:"ok",step:"all-builds-done"})); }); s.listen(3000, () => console.log("Listening on 3000"));' > index.mjs
+
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# Install production dependencies + drizzle-kit for migrations
+COPY package.json package-lock.json ./
+COPY client/package.json ./client/
+COPY server/package.json ./server/
+COPY shared/package.json ./shared/
+RUN npm ci --omit=dev && npm install -w @neurotube/server drizzle-kit
+
+# Copy built artifacts
+COPY --from=builder /app/server/dist/ ./server/dist/
+COPY --from=builder /app/client/dist/ ./client/dist/
+COPY --from=builder /app/shared/dist/ ./shared/dist/
+
+# Copy Drizzle migrations and config
+COPY server/drizzle/ ./server/drizzle/
+COPY server/drizzle.config.ts ./server/
+
+# Copy entrypoint
+COPY docker-entrypoint.sh ./
+RUN chmod +x docker-entrypoint.sh
+
 EXPOSE 3000
-CMD ["node", "index.mjs"]
+
+ENTRYPOINT ["./docker-entrypoint.sh"]
