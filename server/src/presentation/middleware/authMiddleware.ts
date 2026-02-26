@@ -1,7 +1,7 @@
 import type { MiddlewareHandler } from 'hono';
 import type { ITokenService } from '../../domain/ports/ITokenService.js';
 import type { IUserRepository } from '../../domain/ports/IUserRepository.js';
-import type { Role } from '../../domain/entities/Role.js';
+import { type Role, ROLE_HIERARCHY } from '../../domain/entities/Role.js';
 import { createLogger } from '../../infrastructure/logger.js';
 
 const logger = createLogger('AuthMiddleware');
@@ -61,6 +61,86 @@ export function createAuthMiddleware(
 
     const elapsed = Date.now() - start;
     logger.debug('Auth passed', { userId: user.id, role: user.role, elapsed });
+
+    await next();
+  };
+}
+
+/** Public API paths that skip authentication */
+const PUBLIC_PATHS = [
+  '/api/auth/register',
+  '/api/auth/login',
+  '/api/auth/refresh',
+  '/api/auth/logout',
+  '/api/health',
+];
+
+/**
+ * Global auth guard for /api/* — skips PUBLIC_PATHS, enforces auth on everything else.
+ * Apply once in app.ts: `app.use('/api/*', createGlobalAuthGuard(tokenService, userRepo))`
+ */
+export function createGlobalAuthGuard(
+  tokenService: ITokenService,
+  userRepo: IUserRepository,
+): MiddlewareHandler {
+  const authMw = createAuthMiddleware(tokenService, userRepo);
+  logger.debug('Global auth guard created', { publicPaths: PUBLIC_PATHS });
+
+  return async (c, next) => {
+    const requestPath = c.req.path;
+
+    if (PUBLIC_PATHS.some((p) => requestPath === p || requestPath === `${p}/`)) {
+      logger.debug('Public path — skipping auth', { path: requestPath });
+      return next();
+    }
+
+    logger.debug('Protected path — enforcing auth', { path: requestPath });
+    return authMw(c, next);
+  };
+}
+
+/**
+ * Authorization middleware factory — checks that the authenticated user
+ * has at least `minRole` level in the ROLE_HIERARCHY.
+ *
+ * Must be applied AFTER authMiddleware (expects `c.get('user')` to be set).
+ */
+export function createRequireRole(minRole: Role): MiddlewareHandler {
+  logger.debug('RequireRole middleware created', { minRole });
+
+  return async (c, next) => {
+    const authUser = c.get('user') as AuthUser | undefined;
+
+    if (!authUser) {
+      logger.warn('requireRole called without authenticated user');
+      return c.json(
+        { error: 'Unauthorized', message: 'Authentication required', statusCode: 401 },
+        401,
+      );
+    }
+
+    const userLevel = ROLE_HIERARCHY[authUser.role];
+    const requiredLevel = ROLE_HIERARCHY[minRole];
+
+    if (userLevel < requiredLevel) {
+      logger.info('Access denied — insufficient role', {
+        userId: authUser.userId,
+        userRole: authUser.role,
+        requiredRole: minRole,
+        userLevel,
+        requiredLevel,
+      });
+      return c.json(
+        { error: 'Forbidden', message: 'Insufficient permissions', statusCode: 403 },
+        403,
+      );
+    }
+
+    logger.debug('Role check passed', {
+      userId: authUser.userId,
+      role: authUser.role,
+      minRole,
+    });
 
     await next();
   };

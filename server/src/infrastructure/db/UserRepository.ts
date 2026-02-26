@@ -1,4 +1,4 @@
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, count as sqlCount } from 'drizzle-orm';
 import type { IUserRepository } from '../../domain/ports/IUserRepository.js';
 import type { User } from '../../domain/entities/User.js';
 import type { Role } from '../../domain/entities/Role.js';
@@ -144,6 +144,20 @@ export class UserRepository implements IUserRepository {
     const elapsed = Date.now() - start;
     logger.info('findAll() completed', { count: result.length, elapsed });
     return result;
+  }
+
+  async count(): Promise<number> {
+    const start = Date.now();
+    logger.debug('count() called');
+
+    const [row] = await this.db
+      .select({ value: sqlCount() })
+      .from(users);
+
+    const total = Number(row.value);
+    const elapsed = Date.now() - start;
+    logger.info('count() completed', { total, elapsed });
+    return total;
   }
 
   private toEntity(row: typeof users.$inferSelect): User {

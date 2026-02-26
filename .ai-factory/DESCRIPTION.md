@@ -19,7 +19,7 @@ AI-powered YouTube idea generator and script outliner for psychology/neuroscienc
 - **30-Day Content Roadmap:** Strategic content plan with long-form and Shorts ideas
 - **Data Persistence:** Save and browse generated ideas and plans (PostgreSQL)
 - **Authentication:** User registration/login with JWT access tokens (15m, HS256 via jose) + refresh token rotation (7d, opaque UUID), bcrypt password hashing, auth middleware, session management
-- **Role-Based Access:** 4-tier hierarchy (Owner → Admin → Editor → Viewer) with permission checking
+- **Role-Based Access:** 4-tier hierarchy (Owner → Admin → Editor → Viewer) with `requireRole` middleware, global auth guard on /api/*, admin user management (list/update role/deactivate), first-user-as-owner auto-assignment
 
 ## Tech Stack
 
@@ -78,4 +78,4 @@ Pattern: Clean Architecture (backend) + Quasar conventions (frontend)
 - **Accessibility:** Quasar ARIA-compliant components
 - **Persistence:** PostgreSQL for saving generated ideas, plans, history
 - **Authentication:** JWT access + refresh tokens, bcrypt password hashing, session management
-- **Authorization:** 4-tier role hierarchy (Owner → Admin → Editor → Viewer) with ROLE_HIERARCHY permission system
+- **Authorization:** Global auth guard on /api/*, `requireRole(minRole)` middleware, 4-tier ROLE_HIERARCHY, admin API for user management, first-user-as-owner seeding

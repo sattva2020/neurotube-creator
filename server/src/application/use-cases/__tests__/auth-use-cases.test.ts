@@ -44,6 +44,7 @@ function createMocks() {
     updatePassword: vi.fn(),
     deactivate: vi.fn(),
     findAll: vi.fn(),
+    count: vi.fn().mockResolvedValue(0),
   };
 
   const sessionRepo: ISessionRepository = {

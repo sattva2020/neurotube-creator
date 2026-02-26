@@ -5,12 +5,9 @@ import type { Login } from '../../application/use-cases/Login.js';
 import type { RefreshTokens } from '../../application/use-cases/RefreshTokens.js';
 import type { Logout } from '../../application/use-cases/Logout.js';
 import type { IUserRepository } from '../../domain/ports/IUserRepository.js';
-import type { ITokenService } from '../../domain/ports/ITokenService.js';
 import type { User } from '../../domain/entities/User.js';
-import type { MiddlewareHandler } from 'hono';
 import type { AuthVariables } from '../middleware/authMiddleware.js';
 import { registerSchema, loginSchema, refreshSchema, logoutSchema } from '../schemas.js';
-import { createAuthMiddleware } from '../middleware/authMiddleware.js';
 import { createLogger } from '../../infrastructure/logger.js';
 
 const logger = createLogger('AuthRoutes');
@@ -40,14 +37,12 @@ export interface AuthRoutesDeps {
   login: Login;
   refreshTokens: RefreshTokens;
   logout: Logout;
-  tokenService: ITokenService;
   userRepo: IUserRepository;
 }
 
 export function authRoutes(deps: AuthRoutesDeps) {
   const app = new Hono<{ Variables: AuthVariables }>();
-  const { register, login, refreshTokens, logout, tokenService, userRepo } = deps;
-  const authMiddleware: MiddlewareHandler = createAuthMiddleware(tokenService, userRepo);
+  const { register, login, refreshTokens, logout, userRepo } = deps;
 
   app.post('/register', zValidator('json', registerSchema), async (c) => {
     const body = c.req.valid('json');
@@ -134,7 +129,8 @@ export function authRoutes(deps: AuthRoutesDeps) {
     return c.json({ data: { message: 'Logged out' } });
   });
 
-  app.get('/me', authMiddleware, async (c) => {
+  // Auth is enforced by global auth guard — /api/auth/me is not in PUBLIC_PATHS
+  app.get('/me', async (c) => {
     logger.debug('GET /api/auth/me');
 
     const authUser = c.get('user');

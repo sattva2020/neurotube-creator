@@ -125,3 +125,17 @@ export const refreshSchema = z.object({
 export const logoutSchema = z.object({
   refreshToken: z.string().min(1, 'Refresh token is required'),
 });
+
+// --- Admin schemas ---
+
+export const roleSchema = z.enum(['owner', 'admin', 'editor', 'viewer']);
+
+/** PATCH /api/admin/users/:id/role */
+export const updateUserRoleSchema = z.object({
+  role: roleSchema,
+});
+
+/** GET /api/admin/users?role=admin */
+export const listUsersQuerySchema = z.object({
+  role: roleSchema.optional(),
+});

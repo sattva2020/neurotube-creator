@@ -3,6 +3,7 @@ import type { IPasswordHasher } from '../../domain/ports/IPasswordHasher.js';
 import type { ISessionRepository } from '../../domain/ports/ISessionRepository.js';
 import type { ITokenService } from '../../domain/ports/ITokenService.js';
 import type { User } from '../../domain/entities/User.js';
+import type { Role } from '../../domain/entities/Role.js';
 import { createLogger } from '../../infrastructure/logger.js';
 import { parseDuration } from './utils/parseDuration.js';
 
@@ -47,13 +48,18 @@ export class Register {
     const passwordHash = await this.passwordHasher.hash(input.password);
     logger.debug('Password hashed');
 
+    // First user becomes owner, all others become viewer
+    const userCount = await this.userRepo.count();
+    const role: Role = userCount === 0 ? 'owner' : 'viewer';
+    logger.debug('Determined role for new user', { userCount, role });
+
     let user;
     try {
       user = await this.userRepo.save({
         email: input.email,
         displayName: input.displayName,
         passwordHash,
-        role: 'viewer',
+        role,
         isActive: true,
       });
     } catch (err) {

@@ -99,10 +99,13 @@ neurotube-creator/
 │   │   │   │   ├── AnalyzeNiche.ts
 │   │   │   │   ├── GenerateMonetization.ts
 │   │   │   │   ├── GenerateRoadmap.ts
-│   │   │   │   ├── Register.ts          # User registration (auth)
+│   │   │   │   ├── Register.ts          # User registration (auth, first-user-owner)
 │   │   │   │   ├── Login.ts             # User login (auth)
 │   │   │   │   ├── RefreshTokens.ts     # Token rotation (auth)
-│   │   │   │   └── Logout.ts            # Session invalidation (auth)
+│   │   │   │   ├── Logout.ts            # Session invalidation (auth)
+│   │   │   │   ├── GetAllUsers.ts       # Admin: list all users (rbac)
+│   │   │   │   ├── UpdateUserRole.ts    # Admin: change user role (rbac)
+│   │   │   │   └── DeactivateUser.ts    # Admin: soft-delete user (rbac)
 │   │   │   └── dto/                 # Input/output data transfer objects
 │   │   │       ├── GenerateIdeasInput.ts
 │   │   │       └── GenerateIdeasOutput.ts
@@ -133,10 +136,11 @@ neurotube-creator/
 │   │       │   ├── branding.ts           # POST /api/branding/generate
 │   │       │   ├── analysis.ts           # POST /api/analysis/niche
 │   │       │   ├── auth.ts              # POST /api/auth/register,login,refresh,logout + GET /me
+│   │       │   ├── admin.ts             # GET/PATCH/POST /api/admin/users (rbac)
 │   │       │   └── health.ts             # GET  /api/health
 │   │       ├── middleware/
 │   │       │   ├── errorHandler.ts       # Global error handling
-│   │       │   ├── authMiddleware.ts     # JWT Bearer token verification (auth)
+│   │       │   ├── authMiddleware.ts     # Auth: createAuthMiddleware, createGlobalAuthGuard, createRequireRole
 │   │       │   ├── rateLimiter.ts        # Rate limiting
 │   │       │   └── cors.ts              # CORS config
 │   │       └── app.ts                    # Hono app composition root
@@ -453,6 +457,9 @@ export const plans = pgTable('plans', {
 | POST | `/api/auth/refresh` | RefreshTokens | Token rotation |
 | POST | `/api/auth/logout` | Logout | Session invalidation |
 | GET | `/api/auth/me` | — | Current user (requires auth) |
+| GET | `/api/admin/users` | GetAllUsers | List all users (admin+) |
+| PATCH | `/api/admin/users/:id/role` | UpdateUserRole | Change user role (admin+) |
+| POST | `/api/admin/users/:id/deactivate` | DeactivateUser | Deactivate user (admin+) |
 
 ## Anti-Patterns
 

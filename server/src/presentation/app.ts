@@ -43,6 +43,11 @@ import { monetizationRoutes } from './routes/monetization.js';
 import { roadmapRoutes } from './routes/roadmap.js';
 import { sunoRoutes } from './routes/suno.js';
 import { authRoutes } from './routes/auth.js';
+import { adminRoutes } from './routes/admin.js';
+import { createGlobalAuthGuard } from './middleware/authMiddleware.js';
+import type { GetAllUsers } from '../application/use-cases/GetAllUsers.js';
+import type { UpdateUserRole } from '../application/use-cases/UpdateUserRole.js';
+import type { DeactivateUser } from '../application/use-cases/DeactivateUser.js';
 
 const logger = createLogger('App');
 
@@ -68,6 +73,9 @@ export interface AppDeps {
   logout: Logout;
   tokenService: ITokenService;
   userRepo: IUserRepository;
+  getAllUsers: GetAllUsers;
+  updateUserRole: UpdateUserRole;
+  deactivateUser: DeactivateUser;
 }
 
 export function createApp(deps: AppDeps) {
@@ -79,6 +87,7 @@ export function createApp(deps: AppDeps) {
   app.use('*', requestLogger);
   app.use('/api/*', createAnalyticsMiddleware(deps.analytics));
   app.use('*', cors());
+  app.use('/api/*', createGlobalAuthGuard(deps.tokenService, deps.userRepo));
 
   // --- Routes ---
   app.route('/api/health', health);
@@ -99,8 +108,12 @@ export function createApp(deps: AppDeps) {
     login: deps.login,
     refreshTokens: deps.refreshTokens,
     logout: deps.logout,
-    tokenService: deps.tokenService,
     userRepo: deps.userRepo,
+  }));
+  app.route('/api/admin', adminRoutes({
+    getAllUsers: deps.getAllUsers,
+    updateUserRole: deps.updateUserRole,
+    deactivateUser: deps.deactivateUser,
   }));
 
   // --- Static file serving (SPA) ---
@@ -134,6 +147,7 @@ export function createApp(deps: AppDeps) {
       '/api/titles', '/api/descriptions', '/api/branding', '/api/analysis',
       '/api/notebooklm', '/api/shorts', '/api/monetization', '/api/roadmap', '/api/suno',
       '/api/auth',
+      '/api/admin',
     ],
     staticDir: fs.existsSync(staticDirResolved) ? staticDirResolved : 'NOT FOUND',
   });

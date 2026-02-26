@@ -23,4 +23,7 @@ export interface IUserRepository {
 
   /** List all users (admin) */
   findAll(): Promise<User[]>;
+
+  /** Count total users (for first-user-owner check) */
+  count(): Promise<number>;
 }

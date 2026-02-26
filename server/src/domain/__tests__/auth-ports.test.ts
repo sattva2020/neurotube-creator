@@ -26,6 +26,7 @@ describe('IUserRepository port', () => {
       updatePassword: vi.fn().mockResolvedValue(mockUser),
       deactivate: vi.fn().mockResolvedValue(mockUser),
       findAll: vi.fn().mockResolvedValue([mockUser]),
+      count: vi.fn().mockResolvedValue(1),
     };
 
     expect(repo.save).toBeDefined();
@@ -35,6 +36,7 @@ describe('IUserRepository port', () => {
     expect(repo.updatePassword).toBeDefined();
     expect(repo.deactivate).toBeDefined();
     expect(repo.findAll).toBeDefined();
+    expect(repo.count).toBeDefined();
   });
 
   it('should support null returns for lookup methods', async () => {
@@ -46,6 +48,7 @@ describe('IUserRepository port', () => {
       updatePassword: vi.fn().mockResolvedValue(null),
       deactivate: vi.fn().mockResolvedValue(null),
       findAll: vi.fn().mockResolvedValue([]),
+      count: vi.fn().mockResolvedValue(0),
     };
 
     expect(await repo.findByEmail('nonexistent@test.com')).toBeNull();

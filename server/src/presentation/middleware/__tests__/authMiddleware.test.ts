@@ -37,6 +37,7 @@ describe('authMiddleware', () => {
       updatePassword: vi.fn(),
       deactivate: vi.fn(),
       findAll: vi.fn(),
+      count: vi.fn().mockResolvedValue(0),
     };
 
     app = new Hono<{ Variables: AuthVariables }>();

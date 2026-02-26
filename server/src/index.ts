@@ -26,6 +26,9 @@ import { Register } from './application/use-cases/Register.js';
 import { Login } from './application/use-cases/Login.js';
 import { RefreshTokens } from './application/use-cases/RefreshTokens.js';
 import { Logout } from './application/use-cases/Logout.js';
+import { GetAllUsers } from './application/use-cases/GetAllUsers.js';
+import { UpdateUserRole } from './application/use-cases/UpdateUserRole.js';
+import { DeactivateUser } from './application/use-cases/DeactivateUser.js';
 import { PostHogService } from './infrastructure/analytics/index.js';
 import { createApp } from './presentation/app.js';
 
@@ -64,7 +67,10 @@ const register = new Register(userRepo, passwordHasher, sessionRepo, tokenServic
 const login = new Login(userRepo, passwordHasher, sessionRepo, tokenService, env.JWT_REFRESH_EXPIRES_IN);
 const refreshTokens = new RefreshTokens(sessionRepo, userRepo, tokenService, env.JWT_REFRESH_EXPIRES_IN);
 const logout = new Logout(sessionRepo);
-logger.debug('Auth use cases initialized');
+const getAllUsers = new GetAllUsers(userRepo);
+const updateUserRole = new UpdateUserRole(userRepo);
+const deactivateUser = new DeactivateUser(userRepo);
+logger.debug('Auth & admin use cases initialized');
 
 // --- Presentation ---
 const app = createApp({
@@ -89,6 +95,9 @@ const app = createApp({
   logout,
   tokenService,
   userRepo,
+  getAllUsers,
+  updateUserRole,
+  deactivateUser,
 });
 
 // --- Start server ---

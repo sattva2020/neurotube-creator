@@ -8,6 +8,7 @@ import type { Logout } from '../../../application/use-cases/Logout.js';
 import type { ITokenService } from '../../../domain/ports/ITokenService.js';
 import type { IUserRepository } from '../../../domain/ports/IUserRepository.js';
 import type { User } from '../../../domain/entities/User.js';
+import { createGlobalAuthGuard } from '../../middleware/authMiddleware.js';
 
 const mockUser: User = {
   id: 'user-1',
@@ -45,6 +46,7 @@ function createMocks() {
       updatePassword: vi.fn(),
       deactivate: vi.fn(),
       findAll: vi.fn(),
+      count: vi.fn().mockResolvedValue(0),
     } as unknown as IUserRepository,
   };
 }
@@ -64,6 +66,11 @@ describe('Auth Routes', () => {
   beforeEach(() => {
     mocks = createMocks();
     app = new Hono();
+    // Apply global auth guard like app.ts does — protects /me, skips public paths
+    app.use('/api/*', createGlobalAuthGuard(
+      mocks.tokenService as unknown as ITokenService,
+      mocks.userRepo as unknown as IUserRepository,
+    ));
     app.route('/api/auth', authRoutes(mocks));
   });
 

@@ -35,3 +35,16 @@ export interface AuthResponse {
   user: UserPublic;
   tokens: AuthTokens;
 }
+
+// --- Admin types ---
+
+/** PATCH /api/admin/users/:id/role request payload */
+export interface UpdateRoleRequest {
+  role: Role;
+}
+
+/** GET /api/admin/users response */
+export interface AdminUserListResponse {
+  users: UserPublic[];
+  total: number;
+}
