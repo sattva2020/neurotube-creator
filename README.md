@@ -47,10 +47,39 @@ Open `http://localhost:9000` and start generating.
 | [Architecture](docs/architecture.md) | Project structure, FSD, data flow |
 | [Configuration](docs/configuration.md) | Environment variables, Vite & TS config |
 | [AI Features](docs/ai-features.md) | All 12 AI functions: prompts, models, outputs |
+| [Deployment](docs/deployment.md) | Docker, Dokploy, production deployment |
 
-## Deploy
+## Docker
 
-Deployed via Dokploy (self-hosted PaaS, Docker). Single container serves both Hono API and Vue 3 static build.
+```bash
+# Start PostgreSQL only (for local dev)
+docker compose up -d
+
+# Build and run the full stack in Docker
+docker compose --profile full up --build
+```
+
+The app will be available at `http://localhost:3000`.
+
+### Environment Variables
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `DATABASE_URL` | Yes | — | PostgreSQL connection string |
+| `GEMINI_API_KEY` | Yes | — | Google Gemini API key |
+| `PORT` | No | `3000` | Server port |
+| `LOG_LEVEL` | No | `info` | `debug` / `info` / `warn` / `error` |
+| `NODE_ENV` | No | `development` | `development` / `production` / `test` |
+| `STATIC_DIR` | No | auto | Path to client build directory |
+
+### Build Image Manually
+
+```bash
+make docker-build          # build with version tags
+make docker-run             # run from .env.local
+```
+
+See [Deployment Guide](docs/deployment.md) for Dokploy setup and production deployment.
 
 ## License
 

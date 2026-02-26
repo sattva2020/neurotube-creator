@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:16-alpine
+    image: postgres:17-alpine
     container_name: neurotube-postgres
     restart: unless-stopped
     ports:
@@ -14,8 +14,28 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U neurotube -d neurotube_dev"]
       interval: 5s
-      timeout: 5s
+      timeout: 3s
       retries: 5
+
+  app:
+    build:
+      context: .
+      args:
+        VERSION: dev
+        COMMIT: local
+    profiles:
+      - full
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://neurotube:neurotube@postgres:5432/neurotube_dev
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      PORT: 3000
+      LOG_LEVEL: info
+      NODE_ENV: production
 
 volumes:
   pgdata:

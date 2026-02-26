@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+
+# Build outputs (rebuilt inside Docker)
+**/dist/
+
+# Git
+.git/
+.gitignore
+
+# AI Factory & Claude context
+.ai-factory/
+.claude/
+CLAUDE.md
+
+# GitHub
+.github/
+
+# Environment files (secrets)
+.env
+.env.*local
+.env.local
+
+# Documentation
+docs/
+
+# Tests & coverage
+coverage/
+**/__tests__/
+**/*.test.ts
+**/*.spec.ts
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+.DS_Store
