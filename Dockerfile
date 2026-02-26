@@ -12,7 +12,7 @@ LABEL org.opencontainers.image.source="https://github.com/neurotube/creator"
 
 # ---- Dependencies ----
 FROM base AS deps
-RUN apk add --no-cache python3 make g++ git
+RUN apk add --no-cache python3 make g++ git libc6-compat
 COPY package.json package-lock.json ./
 COPY client/package.json ./client/
 COPY server/package.json ./server/
