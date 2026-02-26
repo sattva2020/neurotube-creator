@@ -18,6 +18,8 @@ AI-powered YouTube idea generator and script outliner for psychology/neuroscienc
 - **Monetization Copy:** Patreon/Boosty promotional text generation
 - **30-Day Content Roadmap:** Strategic content plan with long-form and Shorts ideas
 - **Data Persistence:** Save and browse generated ideas and plans (PostgreSQL)
+- **Authentication:** User registration and login with JWT access/refresh tokens, bcrypt password hashing
+- **Role-Based Access:** 4-tier hierarchy (Owner → Admin → Editor → Viewer) with permission checking
 
 ## Tech Stack
 
@@ -74,3 +76,5 @@ Pattern: Clean Architecture (backend) + Quasar conventions (frontend)
 - **Responsiveness:** Quasar responsive grid and breakpoint utilities
 - **Accessibility:** Quasar ARIA-compliant components
 - **Persistence:** PostgreSQL for saving generated ideas, plans, history
+- **Authentication:** JWT access + refresh tokens, bcrypt password hashing, session management
+- **Authorization:** 4-tier role hierarchy (Owner → Admin → Editor → Viewer) with ROLE_HIERARCHY permission system

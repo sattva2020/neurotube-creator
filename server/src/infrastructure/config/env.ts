@@ -12,6 +12,9 @@ const envSchema = z.object({
   STATIC_DIR: z.string().optional(),
   POSTHOG_API_KEY: z.string().optional().default(''),
   POSTHOG_HOST: z.string().optional().default('https://us.i.posthog.com'),
+  JWT_SECRET: z.string().optional().default(''),
+  JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
+  JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -36,6 +39,9 @@ function loadEnv(): Env {
     GEMINI_API_KEY: '***',
     POSTHOG_API_KEY: result.data.POSTHOG_API_KEY ? '***' : '(disabled)',
     POSTHOG_HOST: result.data.POSTHOG_HOST,
+    JWT_SECRET: '***',
+    JWT_ACCESS_EXPIRES_IN: result.data.JWT_ACCESS_EXPIRES_IN,
+    JWT_REFRESH_EXPIRES_IN: result.data.JWT_REFRESH_EXPIRES_IN,
   });
 
   return result.data;

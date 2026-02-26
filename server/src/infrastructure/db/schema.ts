@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp, jsonb } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, timestamp, jsonb, boolean } from 'drizzle-orm/pg-core';
 
 export const ideas = pgTable('ideas', {
   id: uuid('id').defaultRandom().primaryKey(),
@@ -11,6 +11,27 @@ export const ideas = pgTable('ideas', {
   secondaryKeywords: jsonb('secondary_keywords').$type<string[]>().notNull(),
   niche: text('niche').notNull(),
   topic: text('topic').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const users = pgTable('users', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  email: text('email').notNull().unique(),
+  displayName: text('display_name').notNull(),
+  passwordHash: text('password_hash').notNull(),
+  role: text('role').notNull().default('viewer'),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const sessions = pgTable('sessions', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  refreshToken: text('refresh_token').notNull().unique(),
+  expiresAt: timestamp('expires_at').notNull(),
+  userAgent: text('user_agent'),
+  ipAddress: text('ip_address'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 

@@ -72,11 +72,17 @@ neurotube-creator/
 │   │   │   │   ├── VideoIdea.ts     # VideoIdea entity
 │   │   │   │   ├── VideoPlan.ts     # VideoPlan entity
 │   │   │   │   ├── ChannelBranding.ts
-│   │   │   │   └── Niche.ts         # Niche value object
+│   │   │   │   ├── Niche.ts         # Niche value object
+│   │   │   │   ├── User.ts          # User entity (auth)
+│   │   │   │   ├── Role.ts          # Role type + ROLE_HIERARCHY (auth)
+│   │   │   │   └── Session.ts       # Session entity — refresh tokens (auth)
 │   │   │   └── ports/               # Interfaces (contracts)
 │   │   │       ├── IAiService.ts    # AI generation contract
 │   │   │       ├── IIdeaRepository.ts
-│   │   │       └── IPlanRepository.ts
+│   │   │       ├── IPlanRepository.ts
+│   │   │       ├── IUserRepository.ts      # User CRUD (auth)
+│   │   │       ├── ISessionRepository.ts   # Session management (auth)
+│   │   │       └── IPasswordHasher.ts      # Password hashing abstraction (auth)
 │   │   │
 │   │   ├── application/             # 🟡 USE CASES (depends on domain only)
 │   │   │   ├── use-cases/
@@ -100,10 +106,12 @@ neurotube-creator/
 │   │   │   ├── ai/
 │   │   │   │   └── GeminiAiService.ts    # Implements IAiService with @google/genai
 │   │   │   ├── db/
-│   │   │   │   ├── schema.ts             # Drizzle ORM schema (tables)
+│   │   │   │   ├── schema.ts             # Drizzle ORM schema (ideas, plans, users, sessions)
 │   │   │   │   ├── migrate.ts            # Migration runner
 │   │   │   │   ├── IdeaRepository.ts     # Implements IIdeaRepository
-│   │   │   │   └── PlanRepository.ts     # Implements IPlanRepository
+│   │   │   │   ├── PlanRepository.ts     # Implements IPlanRepository
+│   │   │   │   ├── UserRepository.ts     # Implements IUserRepository (auth)
+│   │   │   │   └── SessionRepository.ts  # Implements ISessionRepository (auth)
 │   │   │   └── config/
 │   │   │       └── env.ts                # Environment variable validation
 │   │   │
@@ -131,7 +139,8 @@ neurotube-creator/
 │   └── types/
 │       ├── api.ts                   # API request/response types
 │       ├── idea.ts                  # VideoIdea, Niche
-│       └── branding.ts             # ChannelBranding
+│       ├── branding.ts             # ChannelBranding
+│       └── auth.ts                  # Role, UserPublic, LoginRequest, AuthTokens, AuthResponse
 │
 ├── docker-compose.yml               # Local dev: app + postgres
 ├── Dockerfile                       # Multi-stage: build client + server
