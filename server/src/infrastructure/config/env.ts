@@ -8,6 +8,8 @@ const envSchema = z.object({
   DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
   PORT: z.coerce.number().int().positive().default(3000),
   LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
+  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  STATIC_DIR: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -26,6 +28,8 @@ function loadEnv(): Env {
   logger.debug('Environment validated', {
     PORT: result.data.PORT,
     LOG_LEVEL: result.data.LOG_LEVEL,
+    NODE_ENV: result.data.NODE_ENV,
+    STATIC_DIR: result.data.STATIC_DIR || '(auto)',
     DATABASE_URL: '***',
     GEMINI_API_KEY: '***',
   });
