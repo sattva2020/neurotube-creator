@@ -42,6 +42,10 @@ AI-powered YouTube idea generator and script outliner for psychology/neuroscienc
 ### Shared
 - **Language:** TypeScript (monorepo with shared types)
 
+### Testing
+- **E2E Testing:** Playwright (Page Object Model, API mocking via page.route())
+- **Unit Testing:** Vitest (client, server, E2E helpers)
+
 ### Infrastructure
 - **Deployment:** Dokploy (self-hosted PaaS, Docker)
 - **CI/CD:** GitHub Actions

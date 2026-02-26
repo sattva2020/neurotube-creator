@@ -34,3 +34,9 @@ server/drizzle/meta/
 # Temporary files
 *.tmp
 *.temp
+
+# Playwright
+e2e/test-results/
+playwright-report/
+blob-report/
+/test-results/

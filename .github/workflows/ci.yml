@@ -52,3 +52,75 @@ jobs:
           name: dist
           path: dist/
           retention-days: 7
+
+  e2e-unit:
+    name: E2E Unit Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Run E2E helper unit tests
+        run: npm run test:e2e:unit
+
+  e2e:
+    name: E2E Tests (Playwright)
+    runs-on: ubuntu-latest
+    needs: build
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: neurotube
+          POSTGRES_PASSWORD: neurotube
+          POSTGRES_DB: neurotube_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://neurotube:neurotube@localhost:5432/neurotube_test
+      GEMINI_API_KEY: test-dummy-key
+      NODE_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run database migrations
+        run: npm run db:migrate -w @neurotube/server || true
+
+      - name: Run E2E tests (chromium only)
+        run: npm run test:e2e:chromium
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
