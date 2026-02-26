@@ -15,7 +15,7 @@
 - [x] **Core UI Migration** — IndexPage (поиск, список идей), PlanPage (просмотр плана), NicheToggle, IdeaCard
 - [x] **AI Tools UI Components** — ThumbnailGenerator, TitleGenerator, DescriptionGenerator, BrandingGenerator, прочие AI-инструменты
 - [x] **State Management & Data Persistence** — Pinia stores, сохранение/загрузка идей и планов из PostgreSQL
-- [ ] **Docker & Dokploy Deployment** — multi-stage Dockerfile, docker-compose.yml, Dokploy конфигурация, env management
+- [x] **Docker & Dokploy Deployment** — multi-stage Dockerfile, docker-compose.yml, Dokploy конфигурация, env management
 - [x] **Documentation Update** — обновить docs/ под fullstack архитектуру, README.md, getting-started
 - [x] **Legacy Cleanup & Polish** — удалить src/ (React), обновить CI/CD, финальное тестирование, production readiness
 
@@ -36,3 +36,4 @@
 | Documentation Update | 2026-02-25 |
 | Legacy Cleanup & Polish | 2026-02-25 |
 | State Management & Data Persistence | 2026-02-25 |
+| Docker & Dokploy Deployment | 2026-02-26 |
