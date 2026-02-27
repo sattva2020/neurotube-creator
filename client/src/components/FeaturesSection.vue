@@ -205,20 +205,17 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(var(--icon-color, 0, 245, 255), 0.08);
-  border: 1px solid rgba(var(--icon-color, 0, 245, 255), 0.2);
-  transition: box-shadow 0.3s ease;
+  background: rgba(0, 245, 255, 0.06);
+  border: 1px solid rgba(0, 245, 255, 0.15);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
 
   .feature-card:hover & {
-    box-shadow: 0 0 16px rgba(var(--icon-color, 0, 245, 255), 0.25);
+    border-color: rgba(0, 245, 255, 0.35);
+    box-shadow: 0 0 14px rgba(0, 245, 255, 0.2);
   }
 }
 
 .feature-icon {
-  color: v-bind('undefined');
-}
-
-:deep(.feature-icon) {
   color: var(--icon-color, #00f5ff);
 }
 
