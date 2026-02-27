@@ -1,0 +1,254 @@
+// ============================================
+// Neuro-Futurism Theme — NeuroTube Creator
+// Dark theme with neural glow effects, gradients, glass-morphism
+// ============================================
+
+// --- CSS Custom Properties (Design Tokens) ---
+:root {
+  // Backgrounds
+  --neuro-bg: #0a0a1a;
+  --neuro-bg-secondary: #0d1117;
+  --neuro-bg-tertiary: #111827;
+
+  // Accent colors
+  --neuro-accent: #00f5ff;
+  --neuro-accent-rgb: 0, 245, 255;
+  --neuro-accent-purple: #8b5cf6;
+  --neuro-accent-purple-rgb: 139, 92, 246;
+  --neuro-accent-pink: #ec4899;
+  --neuro-accent-pink-rgb: 236, 72, 153;
+
+  // Text
+  --neuro-text: #e2e8f0;
+  --neuro-text-muted: #94a3b8;
+  --neuro-text-dim: #64748b;
+
+  // Effects
+  --neuro-glow: 0 0 20px rgba(var(--neuro-accent-rgb), 0.3);
+  --neuro-glow-strong: 0 0 40px rgba(var(--neuro-accent-rgb), 0.5);
+  --neuro-glow-purple: 0 0 20px rgba(var(--neuro-accent-purple-rgb), 0.3);
+
+  // Glass
+  --neuro-glass-bg: rgba(13, 17, 23, 0.7);
+  --neuro-glass-border: rgba(var(--neuro-accent-rgb), 0.15);
+  --neuro-glass-blur: 12px;
+
+  // Borders
+  --neuro-border: rgba(255, 255, 255, 0.06);
+  --neuro-border-accent: rgba(var(--neuro-accent-rgb), 0.3);
+
+  // Transitions
+  --neuro-transition: 0.3s ease;
+}
+
+// --- Base Styles ---
+body.neuro-theme {
+  background-color: var(--neuro-bg);
+  color: var(--neuro-text);
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+// --- Utility Classes ---
+
+// Gradient text: cyan → purple
+.gradient-text {
+  background: linear-gradient(135deg, var(--neuro-accent), var(--neuro-accent-purple));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+// Gradient text: purple → pink
+.gradient-text-warm {
+  background: linear-gradient(135deg, var(--neuro-accent-purple), var(--neuro-accent-pink));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+// Glowing text with cyan shadow
+.glow-text {
+  color: var(--neuro-accent);
+  text-shadow: var(--neuro-glow);
+}
+
+// Glass-morphism card
+.glass-card {
+  background: var(--neuro-glass-bg);
+  backdrop-filter: blur(var(--neuro-glass-blur));
+  -webkit-backdrop-filter: blur(var(--neuro-glass-blur));
+  border: 1px solid var(--neuro-glass-border);
+  border-radius: 16px;
+  transition: border-color var(--neuro-transition), box-shadow var(--neuro-transition);
+
+  &:hover {
+    border-color: var(--neuro-border-accent);
+    box-shadow: var(--neuro-glow);
+  }
+}
+
+// Neon border card
+.neon-card {
+  background: var(--neuro-bg-secondary);
+  border: 1px solid var(--neuro-border);
+  border-radius: 12px;
+  transition: border-color var(--neuro-transition), box-shadow var(--neuro-transition);
+
+  &:hover {
+    border-color: var(--neuro-accent);
+    box-shadow: var(--neuro-glow);
+  }
+}
+
+// Glow button
+.glow-btn {
+  background: linear-gradient(135deg, var(--neuro-accent), var(--neuro-accent-purple));
+  color: var(--neuro-bg);
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 28px;
+  cursor: pointer;
+  transition: box-shadow var(--neuro-transition), transform var(--neuro-transition);
+
+  &:hover {
+    box-shadow: var(--neuro-glow-strong);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// Glow input
+.glow-input {
+  background: var(--neuro-bg-secondary);
+  border: 1px solid var(--neuro-border);
+  color: var(--neuro-text);
+  border-radius: 12px;
+  transition: border-color var(--neuro-transition), box-shadow var(--neuro-transition);
+
+  &:focus,
+  &:focus-within {
+    border-color: var(--neuro-accent);
+    box-shadow: var(--neuro-glow);
+    outline: none;
+  }
+}
+
+// Section divider with gradient
+.neuro-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(var(--neuro-accent-rgb), 0.3),
+    transparent
+  );
+  border: none;
+}
+
+// --- Quasar Overrides for Dark Theme ---
+body.neuro-theme {
+  // Header
+  .q-header {
+    background: rgba(10, 10, 26, 0.85) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--neuro-border);
+  }
+
+  // Drawer
+  .q-drawer {
+    background: var(--neuro-bg-secondary) !important;
+    border-right: 1px solid var(--neuro-border) !important;
+    color: var(--neuro-text);
+
+    .q-item-label--header {
+      color: var(--neuro-text-muted);
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+    }
+
+    .q-item {
+      color: var(--neuro-text-muted);
+      border-radius: 8px;
+      margin: 2px 8px;
+      transition: all var(--neuro-transition);
+
+      &:hover {
+        color: var(--neuro-text);
+        background: rgba(var(--neuro-accent-rgb), 0.05);
+      }
+
+      &.q-router-link--active {
+        color: var(--neuro-accent);
+        background: rgba(var(--neuro-accent-rgb), 0.1);
+      }
+    }
+
+    .q-icon {
+      color: inherit;
+    }
+  }
+
+  // Page container
+  .q-page-container {
+    background: var(--neuro-bg);
+  }
+
+  // Chips
+  .q-chip {
+    background: var(--neuro-bg-tertiary);
+    color: var(--neuro-text-muted);
+    border: 1px solid var(--neuro-border);
+    transition: all var(--neuro-transition);
+
+    &:hover,
+    &--selected {
+      border-color: var(--neuro-accent);
+      color: var(--neuro-accent);
+      background: rgba(var(--neuro-accent-rgb), 0.1);
+    }
+  }
+
+  // Input fields
+  .q-field {
+    .q-field__control {
+      background: var(--neuro-bg-secondary);
+      border-radius: 12px;
+      color: var(--neuro-text);
+
+      &::before {
+        border-color: var(--neuro-border);
+      }
+
+      &:hover::before {
+        border-color: var(--neuro-text-muted);
+      }
+    }
+
+    &--focused .q-field__control {
+      &::before {
+        border-color: var(--neuro-accent);
+      }
+
+      &::after {
+        border-color: var(--neuro-accent);
+        box-shadow: var(--neuro-glow);
+      }
+    }
+
+    .q-field__label {
+      color: var(--neuro-text-muted);
+    }
+
+    .q-field__native,
+    .q-field__prefix,
+    .q-field__suffix {
+      color: var(--neuro-text);
+    }
+  }
+}

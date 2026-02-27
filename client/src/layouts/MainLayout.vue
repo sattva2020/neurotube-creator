@@ -1,6 +1,6 @@
 <template>
   <q-layout view="hHh lpR fFf">
-    <q-header elevated class="bg-primary text-white">
+    <q-header elevated>
       <q-toolbar>
         <q-btn
           flat
@@ -12,8 +12,8 @@
           @click="toggleDrawer"
         />
 
-        <q-toolbar-title>
-          <q-icon name="smart_display" class="q-mr-sm" />
+        <q-toolbar-title class="gradient-text" style="font-weight: 700;">
+          <q-icon name="smart_display" class="q-mr-sm glow-text" />
           NeuroTube Creator
         </q-toolbar-title>
 
@@ -93,7 +93,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 
@@ -114,6 +114,13 @@ async function onLogout(): Promise<void> {
 }
 
 onMounted(() => {
+  document.body.classList.add('neuro-theme');
+  console.debug('[MainLayout] Applied neuro-theme to body');
   console.debug('[MainLayout] Layout mounted, user:', authStore.user?.email ?? 'none');
+});
+
+onUnmounted(() => {
+  document.body.classList.remove('neuro-theme');
+  console.debug('[MainLayout] Removed neuro-theme from body');
 });
 </script>
