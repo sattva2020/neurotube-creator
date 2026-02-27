@@ -43,14 +43,19 @@ neurotube-creator/
 │   │   │   ├── MainLayout.vue       # App shell — header, sidebar, footer, user info
 │   │   │   └── AuthLayout.vue       # Minimal layout for login/register (no sidebar)
 │   │   ├── components/              # Reusable UI components
-│   │   │   ├── IdeaCard.vue         # Single video idea card
-│   │   │   ├── NicheToggle.vue      # Psychology/Ambient switcher
+│   │   │   ├── IdeaCard.vue         # Single video idea card (glass-card, neon borders, ScrollTrigger)
+│   │   │   ├── NicheToggle.vue      # Psychology/Ambient switcher (custom dark-theme button group)
+│   │   │   ├── NeuralBackground.vue # Canvas particle neural network (GSAP sine.inOut animation)
+│   │   │   ├── FeaturesSection.vue  # Homepage features section with ScrollTrigger stagger
 │   │   │   ├── ThumbnailGenerator.vue
 │   │   │   ├── TitleGenerator.vue
 │   │   │   ├── DescriptionGenerator.vue
 │   │   │   ├── BrandingGenerator.vue
 │   │   │   └── ...
+│   │   ├── css/                     # Global stylesheets
+│   │   │   └── neuro-theme.scss     # Neuro-Futurism theme: CSS variables, glass-card, glow utilities
 │   │   ├── composables/             # Vue composables (like React hooks)
+│   │   │   ├── useGsap.ts           # GSAP context wrapper with Vue lifecycle cleanup
 │   │   │   ├── useGenerateIdeas.ts  # Idea generation logic + state
 │   │   │   ├── useGeneratePlan.ts   # Plan generation logic
 │   │   │   ├── useApi.ts            # Base API client (get, post, del)

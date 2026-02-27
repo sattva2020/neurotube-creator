@@ -1,22 +1,22 @@
 /**
  * Page Object Model for IndexPage (/).
  * Provides locators and actions for the home page:
- * niche toggle, idea search, idea cards, saved history.
+ * niche toggle, idea search, idea cards, neural background, features section.
  */
 import type { Locator, Page } from '@playwright/test';
 
 export class IndexPage {
   readonly page: Page;
 
-  // Niche toggle
+  // Niche toggle (custom .niche-toggle with .niche-btn)
   readonly nicheToggle: Locator;
   readonly psychologyBtn: Locator;
   readonly ambientBtn: Locator;
 
   // Search form
+  readonly searchForm: Locator;
   readonly searchInput: Locator;
   readonly searchButton: Locator;
-  readonly searchForm: Locator;
 
   // Preset chips
   readonly presetChips: Locator;
@@ -25,7 +25,7 @@ export class IndexPage {
   readonly loadingIndicator: Locator;
   readonly errorBanner: Locator;
 
-  // Idea cards (generated results)
+  // Idea cards (generated results — .idea-card-wrapper)
   readonly ideaCards: Locator;
 
   // History section (saved ideas)
@@ -33,35 +33,47 @@ export class IndexPage {
   readonly historyCards: Locator;
   readonly deleteButtons: Locator;
 
+  // Neuro design elements
+  readonly neuralCanvas: Locator;
+  readonly heroTitle: Locator;
+  readonly heroSubtitle: Locator;
+  readonly featuresSection: Locator;
+
   constructor(page: Page) {
     this.page = page;
 
-    // Niche toggle — QBtnToggle with class .niche-toggle
+    // Niche toggle — custom .niche-toggle with .niche-btn buttons
     this.nicheToggle = page.locator('.niche-toggle');
-    this.psychologyBtn = this.nicheToggle.locator('.q-btn').filter({ hasText: 'Психология' });
-    this.ambientBtn = this.nicheToggle.locator('.q-btn').filter({ hasText: 'Эмбиент' });
+    this.psychologyBtn = this.nicheToggle.locator('.niche-btn').filter({ hasText: 'Психология' });
+    this.ambientBtn = this.nicheToggle.locator('.niche-btn').filter({ hasText: 'Эмбиент' });
 
     // Search form
-    this.searchForm = page.locator('.q-form');
-    this.searchInput = page.locator('.q-input input[type="text"]').first();
-    this.searchButton = page.locator('.q-input .q-btn[type="submit"]');
+    this.searchForm = page.locator('.search-form');
+    this.searchInput = page.locator('.search-input input').first();
+    this.searchButton = page.locator('.search-btn');
 
-    // Preset chips
-    this.presetChips = page.locator('.q-chip');
+    // Preset chips — .neuro-chip inside .chips-wrapper
+    this.presetChips = page.locator('.chips-wrapper .neuro-chip');
 
-    // Loading
+    // Loading indicator
     this.loadingIndicator = page.locator('.q-spinner, .q-linear-progress');
 
     // Error banner
-    this.errorBanner = page.locator('.q-banner.bg-negative');
+    this.errorBanner = page.locator('.error-banner');
 
-    // Idea cards — generated results displayed as QCards
-    this.ideaCards = page.locator('.q-card').filter({ has: page.locator('.q-badge') });
+    // Idea cards — .idea-card-wrapper elements
+    this.ideaCards = page.locator('.idea-card-wrapper');
 
-    // History — saved ideas section with delete buttons
-    this.historySection = page.locator('[class*="history"], [data-testid="history"]').first();
-    this.historyCards = page.locator('.q-card').filter({ has: page.locator('.q-badge') });
-    this.deleteButtons = page.locator('.q-btn[aria-label="delete"], .q-btn .material-icons:has-text("delete")').locator('..');
+    // History
+    this.historySection = page.locator('.ideas-section');
+    this.historyCards = page.locator('.idea-card-wrapper');
+    this.deleteButtons = page.locator('.q-btn').filter({ has: page.locator('i.material-icons:has-text("delete")') });
+
+    // Neuro design elements
+    this.neuralCanvas = page.locator('canvas.neural-bg');
+    this.heroTitle = page.locator('.hero-title');
+    this.heroSubtitle = page.locator('.hero-subtitle');
+    this.featuresSection = page.locator('.features-section');
   }
 
   /** Navigate to the index page */
@@ -112,11 +124,11 @@ export class IndexPage {
     await this.ideaCards.nth(index).click();
   }
 
-  /** Click "Generate Plan" button on an idea card */
+  /** Click "Сгенерировать план" button on an idea card */
   async clickGeneratePlan(index: number) {
     console.debug(`[IndexPage] Clicking "Generate Plan" on card ${index}`);
     const card = this.ideaCards.nth(index);
-    await card.locator('.q-btn').filter({ hasText: /план|plan/i }).click();
+    await card.locator('.idea-card__plan-btn').click();
   }
 
   /** Check if loading indicator is visible */
@@ -132,5 +144,17 @@ export class IndexPage {
   /** Get the error banner text */
   async getErrorText(): Promise<string> {
     return this.errorBanner.innerText();
+  }
+
+  /** Check whether the dark neuro-theme body class is applied */
+  async hasDarkTheme(): Promise<boolean> {
+    const cls = await this.page.locator('body').getAttribute('class');
+    return (cls ?? '').includes('neuro-theme');
+  }
+
+  /** Scroll to features section */
+  async scrollToFeatures() {
+    console.debug('[IndexPage] Scrolling to features section');
+    await this.featuresSection.scrollIntoViewIfNeeded();
   }
 }

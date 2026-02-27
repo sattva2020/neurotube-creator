@@ -33,6 +33,8 @@ AI-powered YouTube idea generator and script outliner for psychology/neuroscienc
 - **State Management:** Pinia
 - **Routing:** Vue Router (via Quasar)
 - **UI Components:** Quasar Material Design components
+- **Animations:** GSAP 3.x + ScrollTrigger plugin — entrance timelines, scroll-triggered effects, canvas particle system
+- **Design Theme:** Neuro-Futurism — dark theme, CSS variables, glass-morphism, glow effects
 - **Icons:** Quasar icons (Material Icons)
 - **Analytics:** PostHog (`posthog-js`) — opt-in client-side event tracking and auto-pageviews
 

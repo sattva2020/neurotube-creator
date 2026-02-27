@@ -56,14 +56,14 @@
 
 ### Phase 2: Background & Hero
 
-#### Task 3: Create animated NeuralBackground component
+#### ~~Task 3: Create animated NeuralBackground component~~ [x]
 - Canvas-based neural network visualization (particles + connections)
 - GSAP for smooth particle movement
 - Responsive, performance-optimized (requestAnimationFrame)
 - **Files:** CREATE `NeuralBackground.vue`
 - **Blocked by:** Task 1
 
-#### Task 4: Redesign hero section with GSAP text animations
+#### ~~Task 4: Redesign hero section with GSAP text animations~~ [x]
 - Gradient text headlines, GSAP timeline: slide-up + fade-in sequence
 - Text split into spans for per-word/per-char animation
 - Niche switch transition animation
@@ -72,7 +72,7 @@
 
 ### Phase 3: Interactive Elements
 
-#### Task 5: Animate search form & preset chips
+#### ~~Task 5: Animate search form & preset chips~~ [x]
 - Glow focus effect on search input
 - Pulsing submit button
 - Stagger chip entrance (0.08s delay per chip)
@@ -80,14 +80,14 @@
 - **Files:** EDIT `IndexPage.vue`
 - **Blocked by:** Tasks 2, 4
 
-#### Task 6: Animate idea cards with ScrollTrigger
+#### ~~Task 6: Animate idea cards with ScrollTrigger~~ [x]
 - ScrollTrigger fade-in + slide-up for each card
 - Neuro-styled IdeaCard (glass-card, neon borders)
 - NicheToggle restyled for dark theme
 - **Files:** EDIT `IdeaCard.vue`, EDIT `NicheToggle.vue`, EDIT `IndexPage.vue`
 - **Blocked by:** Tasks 1, 2
 
-#### Task 7: Add «Features» section with scroll animations
+#### ~~Task 7: Add «Features» section with scroll animations~~ [x]
 - 3-4 feature cards: AI ideas, SEO, scripts, niche analysis
 - Glass-card style, icon glow, stagger entrance
 - ScrollTrigger: appear on scroll
@@ -96,14 +96,14 @@
 
 ### Phase 4: Quality & Docs
 
-#### Task 8: E2E tests for new homepage
+#### ~~Task 8: E2E tests for new homepage~~ [x]
 - Playwright tests: hero visible, canvas exists, niche switch works
 - Search form functional, chips clickable
 - Dark theme applied, features section scrolls in
 - **Files:** CREATE e2e test file
 - **Blocked by:** Tasks 4, 5, 6, 7
 
-#### Task 9: Update project documentation
+#### ~~Task 9: Update project documentation~~ [x]
 - Add GSAP to tech stack in DESCRIPTION.md
 - Add new components/composables to ARCHITECTURE.md
 - **Files:** EDIT `DESCRIPTION.md`, EDIT `ARCHITECTURE.md`
