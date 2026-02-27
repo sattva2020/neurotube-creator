@@ -5,7 +5,7 @@
     </q-card-section>
 
     <q-card-section>
-      <q-form @submit.prevent="onSubmit" class="q-gutter-md">
+      <q-form @submit.prevent="onSubmit" greedy class="q-gutter-md">
         <q-input
           v-model="form.displayName"
           label="Имя"
