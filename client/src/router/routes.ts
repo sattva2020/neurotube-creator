@@ -12,26 +12,7 @@ declare module 'vue-router' {
 }
 
 export const routes: RouteRecordRaw[] = [
-  // Auth routes (no sidebar, guest-only)
-  {
-    path: '/',
-    component: AuthLayout,
-    children: [
-      {
-        path: 'login',
-        name: 'login',
-        component: () => import('@/pages/LoginPage.vue'),
-        meta: { guest: true },
-      },
-      {
-        path: 'register',
-        name: 'register',
-        component: () => import('@/pages/RegisterPage.vue'),
-        meta: { guest: true },
-      },
-    ],
-  },
-  // Main app routes (requires auth)
+  // Main app routes (requires auth) — must be first so '/' matches MainLayout
   {
     path: '/',
     component: MainLayout,
@@ -57,6 +38,25 @@ export const routes: RouteRecordRaw[] = [
         name: 'admin',
         component: () => import('@/pages/AdminPage.vue'),
         meta: { requiresRole: 'admin' },
+      },
+    ],
+  },
+  // Auth routes (no sidebar, guest-only)
+  {
+    path: '/',
+    component: AuthLayout,
+    children: [
+      {
+        path: 'login',
+        name: 'login',
+        component: () => import('@/pages/LoginPage.vue'),
+        meta: { guest: true },
+      },
+      {
+        path: 'register',
+        name: 'register',
+        component: () => import('@/pages/RegisterPage.vue'),
+        meta: { guest: true },
       },
     ],
   },
