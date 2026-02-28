@@ -101,8 +101,18 @@
     <!-- === Ideas Section === -->
     <section class="ideas-section">
       <div class="section-inner">
+        <!-- Loading state -->
+        <template v-if="ideasStore.isLoading">
+          <div class="loading-state">
+            <div class="loading-spinner">
+              <q-spinner-orbit color="cyan" size="56px" />
+            </div>
+            <p class="loading-text">ИИ анализирует тему и генерирует идеи...</p>
+          </div>
+        </template>
+
         <!-- Generated ideas -->
-        <template v-if="ideasStore.items.length > 0">
+        <template v-else-if="ideasStore.items.length > 0">
           <div class="section-header">
             <span class="section-title gradient-text">Сгенерированные Идеи</span>
             <q-badge class="neuro-badge" rounded>
@@ -112,8 +122,8 @@
 
           <div class="cards-list" ref="cardsListRef">
             <IdeaCard
-              v-for="(idea, idx) in ideasStore.items"
-              :key="idx"
+              v-for="idea in ideasStore.items"
+              :key="idea.title"
               :idea="idea"
               :is-selected="ideasStore.selected?.title === idea.title"
               @select="onSelectIdea"
@@ -696,6 +706,36 @@ watch(historyCardsRef, (el) => {
     font-size: 1rem;
     color: var(--neuro-text-dim);
   }
+}
+
+// ========================
+// Loading State
+// ========================
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  padding: 48px 24px;
+  background: rgba(0, 245, 255, 0.03);
+  border: 1px solid rgba(0, 245, 255, 0.1);
+  border-radius: 16px;
+}
+
+.loading-spinner {
+  margin-bottom: 20px;
+}
+
+.loading-text {
+  font-size: 1rem;
+  color: var(--neuro-text-muted);
+  animation: pulse-text 2s ease-in-out infinite;
+}
+
+@keyframes pulse-text {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
 }
 
 // ========================
